@@ -267,8 +267,12 @@ export default function StoreSettings() {
                           <SelectValue placeholder="حدائق غذائية وعطور" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="restaurant">مطعم</SelectItem>
+                          <SelectItem value="shipping">شركة شحن</SelectItem>
+                          <SelectItem value="travel">شركة سفر وسياحة</SelectItem>
+                          <SelectItem value="clothing">محلات ملابس</SelectItem>
+                          <SelectItem value="perfumes">محلات عطور</SelectItem>
                           <SelectItem value="food-fragrance">حدائق غذائية وعطور</SelectItem>
-                          <SelectItem value="clothing">ملابس وإكسسوارات</SelectItem>
                           <SelectItem value="electronics">إلكترونيات</SelectItem>
                           <SelectItem value="home">منزل وحديقة</SelectItem>
                           <SelectItem value="books">كتب وقرطاسية</SelectItem>
