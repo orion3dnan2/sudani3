@@ -2,16 +2,25 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Building, Mail, ClipboardList, Users, Briefcase, Store, BellRing, Star } from "lucide-react";
+import backgroundImage from "@assets/image_1754214186296.png";
 
 export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative">
-        <div className="h-96 bg-gradient-to-l from-blue-900 via-teal-800 to-yellow-600 flex items-center justify-center relative overflow-hidden">
+        <div 
+          className="h-96 flex items-center justify-center relative overflow-hidden"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        >
           <div className="absolute inset-0 bg-black bg-opacity-40"></div>
           <div className="relative text-center text-white z-10">
-            <h1 className="text-4xl md:text-6xl font-bold mb-4">البيت السوداني</h1>
+            <h1 className="text-4xl md:text-6xl font-bold mb-4">القفة السودانية</h1>
             <p className="text-lg md:text-xl mb-8">سوق وخدمات وتجارات السودان في الخليج والعالم</p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link href="/market">

@@ -1,6 +1,6 @@
 # Overview
 
-This is a full-stack Arabic marketplace application called "البيت السوداني" (The Sudanese House) - a platform for Sudanese businesses and services in the Gulf region and worldwide. The application provides an e-commerce marketplace with user authentication, product management, order processing, and a comprehensive dashboard for merchants. The platform includes multiple user roles (customer, merchant, admin) and features both marketplace functionality and service listings.
+This is a full-stack Arabic marketplace application called "القفة السودانية" (The Sudanese Basket) - a platform for Sudanese businesses and services in the Gulf region and worldwide. The application provides an e-commerce marketplace with user authentication, product management, order processing, and a comprehensive dashboard for merchants. The platform includes multiple user roles (customer, merchant, admin) and features both marketplace functionality and service listings with a custom background image on the hero section.
 
 # User Preferences
 
