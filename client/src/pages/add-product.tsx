@@ -103,6 +103,7 @@ export default function AddProduct() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/products/user"] });
+      // Show success message and redirect
       setLocation("/products-management");
     },
   });
@@ -133,6 +134,9 @@ export default function AddProduct() {
                 <Plus className="w-4 h-4 ml-2" />
                 إضافة منتج جديد
               </Button>
+              <div className="text-sm text-gray-600">
+                المتجر: {stores && Array.isArray(stores) && stores.length > 0 ? stores[0].name : "لا يوجد متجر"}
+              </div>
             </div>
             <h1 className="text-xl font-bold text-gray-900">إضافة منتج جديد</h1>
             <div className="flex items-center space-x-reverse space-x-2">
@@ -370,7 +374,7 @@ export default function AddProduct() {
             </CardContent>
           </Card>
 
-          {/* Submit Buttons */}
+          {/* Submit Button */}
           <div className="flex items-center justify-between">
             <Button
               type="button"
@@ -379,22 +383,13 @@ export default function AddProduct() {
             >
               إلغاء
             </Button>
-            <div className="flex space-x-reverse space-x-4">
-              <Button
-                type="button"
-                variant="outline"
-                className="bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100"
-              >
-                حفظ كمسودة
-              </Button>
-              <Button
-                type="submit"
-                className="bg-blue-500 hover:bg-blue-600 text-white"
-                disabled={createProductMutation.isPending}
-              >
-                {createProductMutation.isPending ? "جاري النشر..." : "نشر المنتج"}
-              </Button>
-            </div>
+            <Button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-8"
+              disabled={createProductMutation.isPending}
+            >
+              {createProductMutation.isPending ? "جاري الحفظ..." : "حفظ المنتج"}
+            </Button>
           </div>
         </form>
       </div>

@@ -5,9 +5,21 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, ArrowLeft, Eye, Edit, Trash2, List, Grid3X3, Search, Package } from "lucide-react";
+import { Plus, ArrowLeft, Eye, Edit, Trash2, List, Grid3X3, Search, Package, Play, Pause, RotateCcw } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  stock: number;
+  isActive: boolean;
+  image?: string;
+}
 
 export default function ProductsManagement() {
   const { user } = useAuth();
@@ -16,6 +28,8 @@ export default function ProductsManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   // Redirect if not authenticated or not authorized
   useEffect(() => {
@@ -25,19 +39,75 @@ export default function ProductsManagement() {
   }, [user, setLocation]);
 
   // Fetch products for the current user
-  const { data: products = [], isLoading: productsLoading } = useQuery({
+  const { data: products = [], isLoading: productsLoading } = useQuery<Product[]>({
     queryKey: ["/api/products/user", user?.id],
     enabled: !!user?.id,
   });
 
-  const filteredProducts = products.filter((product: any) => {
+  // Get user's store name
+  const { data: stores } = useQuery({
+    queryKey: ["/api/stores/owner", user?.id],
+    enabled: !!user?.id,
+  });
+
+  const storeName = stores && Array.isArray(stores) && stores.length > 0 ? stores[0].name : "المتجر";
+
+  // Product management mutations
+  const toggleProductStatusMutation = useMutation({
+    mutationFn: async ({ productId, isActive }: { productId: string; isActive: boolean }) => {
+      const response = await fetch(`/api/products/${productId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive }),
+      });
+      if (!response.ok) throw new Error('فشل في تحديث حالة المنتج');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/products/user"] });
+      toast({ title: "تم تحديث حالة المنتج بنجاح" });
+    },
+    onError: () => {
+      toast({ title: "خطأ في تحديث حالة المنتج", variant: "destructive" });
+    },
+  });
+
+  const deleteProductMutation = useMutation({
+    mutationFn: async (productId: string) => {
+      const response = await fetch(`/api/products/${productId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('فشل في حذف المنتج');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/products/user"] });
+      toast({ title: "تم حذف المنتج بنجاح" });
+    },
+    onError: () => {
+      toast({ title: "خطأ في حذف المنتج", variant: "destructive" });
+    },
+  });
+
+  const filteredProducts = products.filter((product: Product) => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          product.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === "all" || product.status === statusFilter;
+    const matchesStatus = statusFilter === "all" || 
+                         (statusFilter === "active" && product.isActive) ||
+                         (statusFilter === "inactive" && !product.isActive);
     const matchesCategory = categoryFilter === "all" || product.category === categoryFilter;
     
     return matchesSearch && matchesStatus && matchesCategory;
   });
+
+  const handleToggleStatus = (productId: string, currentStatus: boolean) => {
+    toggleProductStatusMutation.mutate({ productId, isActive: !currentStatus });
+  };
+
+  const handleDeleteProduct = (productId: string) => {
+    if (confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
+      deleteProductMutation.mutate(productId);
+    }
+  };
 
   if (!user) return null;
 
@@ -55,10 +125,9 @@ export default function ProductsManagement() {
                 <Plus className="w-4 h-4 ml-2" />
                 إضافة منتج جديد
               </Button>
-              <Button variant="outline" className="border-red-300 text-red-600 hover:bg-red-50">
-                إعادة تعيين المنتجات
-              </Button>
-              <span className="text-sm text-gray-500">رؤل أقلامي</span>
+              <div className="text-sm text-gray-600">
+                المتجر: {storeName}
+              </div>
             </div>
             <div className="flex items-center space-x-reverse space-x-4">
               <span className="text-sm text-gray-500">{products.length} منتج في متجرك</span>
@@ -94,9 +163,9 @@ export default function ProductsManagement() {
               ℹ
             </div>
             <div>
-              <h3 className="font-medium text-blue-900">منتجات متجر رؤل أقلامي</h3>
+              <h3 className="font-medium text-blue-900">منتجات {storeName}</h3>
               <p className="text-sm text-blue-700">
-                متجرك لديك في السوق العام للبيع • يمكن للمشترين رؤية وشراء منتجاتك
+                متجرك متاح في السوق العام للبيع • يمكن للمشترين رؤية وشراء منتجاتك
               </p>
             </div>
           </div>
@@ -125,24 +194,27 @@ export default function ProductsManagement() {
             <div className="flex items-center space-x-reverse space-x-4">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-40">
-                  <SelectValue placeholder="الأحدث أولاً" />
+                  <SelectValue placeholder="جميع الحالات" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">الأحدث أولاً</SelectItem>
-                  <SelectItem value="نشط">نشط</SelectItem>
-                  <SelectItem value="غير نشط">غير نشط</SelectItem>
+                  <SelectItem value="all">جميع الحالات</SelectItem>
+                  <SelectItem value="active">نشط</SelectItem>
+                  <SelectItem value="inactive">غير نشط</SelectItem>
                 </SelectContent>
               </Select>
               
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                 <SelectTrigger className="w-40">
-                  <SelectValue placeholder="جميع الحالات" />
+                  <SelectValue placeholder="جميع الفئات" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">جميع الحالات</SelectItem>
-                  <SelectItem value="نشط">نشط</SelectItem>
-                  <SelectItem value="غير نشط">غير نشط</SelectItem>
-                  <SelectItem value="نفد المخزون">نفد المخزون</SelectItem>
+                  <SelectItem value="all">جميع الفئات</SelectItem>
+                  <SelectItem value="حلويات">حلويات</SelectItem>
+                  <SelectItem value="عطور">عطور</SelectItem>
+                  <SelectItem value="بخور">بخور</SelectItem>
+                  <SelectItem value="ملابس">ملابس</SelectItem>
+                  <SelectItem value="أطعمة">أطعمة</SelectItem>
+                  <SelectItem value="مشروبات">مشروبات</SelectItem>
                 </SelectContent>
               </Select>
               
@@ -186,8 +258,8 @@ export default function ProductsManagement() {
                     alt={product.name}
                     className="w-full h-full object-cover"
                   />
-                  <Badge className="absolute top-2 right-2 bg-green-500 text-white">
-                    نشط
+                  <Badge className={`absolute top-2 right-2 ${product.isActive ? 'bg-green-500' : 'bg-gray-500'} text-white`}>
+                    {product.isActive ? 'نشط' : 'متوقف'}
                   </Badge>
                 </div>
                 <CardContent className="p-4">
@@ -200,14 +272,26 @@ export default function ProductsManagement() {
                     <span className="text-sm text-gray-500">{product.stock || 50} قطعة</span>
                   </div>
                   <div className="flex items-center space-x-reverse space-x-2">
-                    <Button variant="outline" size="sm" className="flex-1">
-                      <Eye className="w-4 h-4 ml-1" />
-                      عرض
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className={`flex-1 ${product.isActive ? 'text-orange-600 hover:text-orange-700' : 'text-green-600 hover:text-green-700'}`}
+                      onClick={() => handleToggleStatus(product.id, product.isActive)}
+                      disabled={toggleProductStatusMutation.isPending}
+                    >
+                      {product.isActive ? <Pause className="w-4 h-4 ml-1" /> : <Play className="w-4 h-4 ml-1" />}
+                      {product.isActive ? 'إيقاف' : 'نشر'}
                     </Button>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="text-blue-600 hover:text-blue-700">
                       <Edit className="w-4 h-4" />
                     </Button>
-                    <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="text-red-600 hover:text-red-700"
+                      onClick={() => handleDeleteProduct(product.id)}
+                      disabled={deleteProductMutation.isPending}
+                    >
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
@@ -230,19 +314,33 @@ export default function ProductsManagement() {
                     <p className="text-sm text-gray-600 mt-1">{product.description}</p>
                     <div className="flex items-center space-x-reverse space-x-4 mt-2">
                       <span className="text-lg font-bold text-gray-900">${product.price}</span>
-                      <Badge className="bg-green-500 text-white">نشط</Badge>
+                      <Badge className={`${product.isActive ? 'bg-green-500' : 'bg-gray-500'} text-white`}>
+                        {product.isActive ? 'نشط' : 'متوقف'}
+                      </Badge>
                       <span className="text-sm text-gray-500">{product.stock || 50} قطعة</span>
                     </div>
                   </div>
                   <div className="flex items-center space-x-reverse space-x-2">
-                    <Button variant="outline" size="sm">
-                      <Eye className="w-4 h-4 ml-1" />
-                      عرض
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className={`${product.isActive ? 'text-orange-600 hover:text-orange-700' : 'text-green-600 hover:text-green-700'}`}
+                      onClick={() => handleToggleStatus(product.id, product.isActive)}
+                      disabled={toggleProductStatusMutation.isPending}
+                    >
+                      {product.isActive ? <Pause className="w-4 h-4 ml-1" /> : <Play className="w-4 h-4 ml-1" />}
+                      {product.isActive ? 'إيقاف' : 'نشر'}
                     </Button>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="text-blue-600 hover:text-blue-700">
                       <Edit className="w-4 h-4" />
                     </Button>
-                    <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="text-red-600 hover:text-red-700"
+                      onClick={() => handleDeleteProduct(product.id)}
+                      disabled={deleteProductMutation.isPending}
+                    >
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
