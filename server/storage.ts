@@ -101,6 +101,52 @@ export class MemStorage implements IStorage {
     };
     this.stores.set(storeId, demoStore);
 
+    // Create sample products for the store
+    const product1Id = randomUUID();
+    const product1: Product = {
+      id: product1Id,
+      storeId: storeId,
+      name: "طلب أقلامي فراولة وسط",
+      description: "طلب الأقلامي فراولة وسط أصل من مطعم رؤل أقلامي - فراولة منضوج طازج بالطريقة السودانية التقليدية مع الحلوى",
+      price: 8,
+      category: "حلويات",
+      stock: 50,
+      isActive: true,
+      image: "https://via.placeholder.com/300x200?text=أقلامي+فراولة",
+      createdAt: new Date(),
+    };
+    this.products.set(product1Id, product1);
+
+    const product2Id = randomUUID();
+    const product2: Product = {
+      id: product2Id,
+      storeId: storeId,
+      name: "عطر صندل سوداني",
+      description: "عطر صندل سوداني أصلي من أفضل أنواع الصندل المستخرج من الأشجار السودانية الطبيعية",
+      price: 25,
+      category: "عطور",
+      stock: 30,
+      isActive: true,
+      image: "https://via.placeholder.com/300x200?text=عطر+صندل",
+      createdAt: new Date(),
+    };
+    this.products.set(product2Id, product2);
+
+    const product3Id = randomUUID();
+    const product3: Product = {
+      id: product3Id,
+      storeId: storeId,
+      name: "دكركة طيبش",
+      description: "دكركة طيبش أصلية مصنوعة بالطريقة التقليدية السودانية من أجود أنواع البخور والطيب",
+      price: 15,
+      category: "بخور",
+      stock: 20,
+      isActive: true,
+      image: "https://via.placeholder.com/300x200?text=دكركة+طيبش",
+      createdAt: new Date(),
+    };
+    this.products.set(product3Id, product3);
+
     // Create demo orders
     for (let i = 1; i <= 5; i++) {
       const orderId = randomUUID();

@@ -123,6 +123,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/products/user/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const stores = await storage.getStoresByOwner(userId);
+      const allProducts = [];
+      
+      for (const store of stores) {
+        const products = await storage.getProductsByStore(store.id);
+        allProducts.push(...products);
+      }
+      
+      res.json(allProducts);
+    } catch (error) {
+      res.status(500).json({ message: "خطأ في الخادم" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
