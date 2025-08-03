@@ -35,8 +35,12 @@ export const products = pgTable("products", {
   category: text("category").notNull(),
   storeId: varchar("store_id").notNull().references(() => stores.id),
   stock: integer("stock").notNull().default(0),
-  status: text("status").notNull().default("active"), // active, inactive, out_of_stock
-  images: jsonb("images").default([]),
+  weight: decimal("weight", { precision: 8, scale: 3 }),
+  dimensions: text("dimensions"),
+  specifications: text("specifications"),
+  tags: text("tags"),
+  image: text("image"),
+  isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
 

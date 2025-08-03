@@ -144,17 +144,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const productData = req.body;
       
-      // For demo purposes, use the first available store
-      const stores = await storage.getStoresByOwner("109fb3f0-f57b-4976-8d9b-07e9d91eedae"); // merchant user ID
+      // Get or create store for user
+      let stores = await storage.getStoresByOwner(req.user?.id || "");
+      
+      // If no store exists, create a default one
       if (stores.length === 0) {
-        return res.status(400).json({ message: "لا يوجد متجر مرتبط بهذا المستخدم" });
+        const newStore = await storage.createStore({
+          name: "متجري الجديد",
+          description: "متجر المنتجات المميزة",
+          ownerId: req.user?.id || "",
+          isActive: true,
+          settings: {},
+        });
+        stores = [newStore];
       }
 
-      const product = await storage.createProduct({
+      // Convert price to string for storage
+      const productToCreate = {
         ...productData,
+        price: productData.price.toString(),
+        weight: productData.weight ? productData.weight.toString() : null,
         storeId: stores[0].id,
         isActive: true,
-      });
+      };
+
+      console.log("Creating product:", productToCreate);
+      const product = await storage.createProduct(productToCreate);
 
       res.status(201).json(product);
     } catch (error) {
