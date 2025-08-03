@@ -19,7 +19,7 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-10 text-sm">
             <div className="flex items-center space-x-reverse space-x-4 text-gray-600">
-              <span>100+ تاجر يتداولون في الخليج</span>
+              <span>يج</span>
               <span>£</span>
               <span>🌞</span>
               <span>القطيفة</span>
@@ -34,7 +34,6 @@ export default function Navbar() {
           </div>
         </div>
       </div>
-
       {/* Main navigation row */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
