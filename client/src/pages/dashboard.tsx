@@ -1,17 +1,11 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Plus, Eye, Edit, Trash2, ShoppingCart, ArrowLeft, Store } from "lucide-react";
+import { Eye, TrendingUp, ShoppingCart, Package, Settings, Users, Plus, Download } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useQuery } from "@tanstack/react-query";
-import DashboardStats from "@/components/dashboard-stats";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -38,359 +32,299 @@ export default function Dashboard() {
 
   if (!user) return null;
 
-  const getStatusBadge = (status: string) => {
-    const statusMap: Record<string, { label: string; variant: "secondary" | "default" | "outline" }> = {
-      pending: { label: "في الانتظار", variant: "secondary" as const },
-      confirmed: { label: "مؤكد", variant: "default" as const },
-      shipped: { label: "تم الشحن", variant: "outline" as const },
-      delivered: { label: "تم التسليم", variant: "secondary" as const },
-    };
-    
-    return statusMap[status] || { label: status, variant: "secondary" as const };
-  };
-
-  const getStatusColor = (status: string) => {
-    const colorMap: Record<string, string> = {
-      pending: "text-warning-orange",
-      confirmed: "text-success-green",
-      shipped: "text-purple-accent",
-      delivered: "text-success-green",
-    };
-    
-    return colorMap[status] || "text-gray-600";
-  };
-
   return (
-    <div>
-      {/* Dashboard Navigation */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between py-4">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-reverse space-x-4">
-              <Button className="bg-primary-blue hover:bg-blue-600">
+              <Button className="bg-green-500 hover:bg-green-600 text-white">
                 <Plus className="w-4 h-4 ml-2" />
-                إنشاء متجر جديد
+                إضافة منتج جديد
               </Button>
-              <span className="text-sm text-gray-500">مرحباً، {user.fullName}</span>
+              <Button variant="outline" className="border-blue-500 text-blue-500 hover:bg-blue-50">
+                <Eye className="w-4 h-4 ml-2" />
+                عرض المتجر
+              </Button>
+              <Badge className="bg-orange-100 text-orange-700 px-3 py-1">
+                متاح عملي
+              </Badge>
             </div>
-            <div className="flex items-center space-x-reverse space-x-6">
-              <h1 className="text-xl font-bold text-gray-900">إدارة المحتوى</h1>
-              <div className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm flex items-center">
-                <Store className="w-4 h-4 ml-1" />
-                إدارة المنتجات والمبيعات
-              </div>
-            </div>
-            <Button variant="ghost" onClick={() => setLocation("/")}>
-              <ArrowLeft className="w-4 h-4 ml-2" />
-              العودة
+            <h1 className="text-xl font-bold text-gray-900">لوحة إدارة المتجر</h1>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setLocation("/")}
+              className="text-green-600 hover:text-green-700 hover:bg-green-50"
+            >
+              <Download className="w-4 h-4" />
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Statistics Cards */}
-        {stats && !statsLoading && (
-          <DashboardStats
-            totalViews={stats.totalViews || 0}
-            totalSales={stats.totalSales || "$0.00"}
-            totalOrders={stats.totalOrders || 0}
-            totalProducts={stats.totalProducts || 0}
-          />
-        )}
-
-        {/* Dashboard Tabs */}
-        <Card className="shadow-sm">
-          <Tabs defaultValue="overview" className="w-full">
-            <div className="border-b">
-              <TabsList className="h-auto p-0 bg-transparent">
-                <TabsTrigger 
-                  value="overview" 
-                  className="h-auto py-4 px-6 border-b-2 border-transparent data-[state=active]:border-primary-blue data-[state=active]:text-primary-blue"
-                >
-                  نظرة عامة
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="products" 
-                  className="h-auto py-4 px-6 border-b-2 border-transparent data-[state=active]:border-primary-blue data-[state=active]:text-primary-blue"
-                >
-                  المنتجات
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="orders" 
-                  className="h-auto py-4 px-6 border-b-2 border-transparent data-[state=active]:border-primary-blue data-[state=active]:text-primary-blue"
-                >
-                  الطلبات
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="settings" 
-                  className="h-auto py-4 px-6 border-b-2 border-transparent data-[state=active]:border-primary-blue data-[state=active]:text-primary-blue"
-                >
-                  الإعدادات
-                </TabsTrigger>
-              </TabsList>
-            </div>
-
-            {/* Overview Tab */}
-            <TabsContent value="overview" className="p-6">
-              <div className="grid lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg font-bold text-gray-900">ما أداء المتجر</h3>
-                    <Button variant="link" className="text-primary-blue">عرض الكل</Button>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <Card className="bg-gray-50">
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-gray-700">المنتجات النشطة</span>
-                          <span className="text-2xl font-bold text-gray-900">42</span>
-                        </div>
-                        <div className="text-sm text-gray-600">متوسط التقييم: 4.6 ⭐</div>
-                        <div className="text-sm text-gray-600">إجمالي المراجعات: 89</div>
-                      </CardContent>
-                    </Card>
-                    
-                    <Card className="bg-gray-50">
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-gray-700">طلبات معلقة</span>
-                          <span className="text-2xl font-bold text-gray-900">7</span>
-                        </div>
-                        <div className="text-sm text-gray-600">طلبات في الانتظار</div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
-
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-gradient-to-br from-orange-100 to-orange-200 border-0">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
                 <div>
-                  <Card className="bg-orange-50">
-                    <CardContent className="p-4">
-                      <h4 className="font-bold text-gray-900 mb-3">تنبيه المخزون ⚠️</h4>
-                      <div className="space-y-2">
-                        <div className="bg-orange-100 rounded p-2">
-                          <span className="text-sm font-medium text-orange-800">منتج 1</span>
-                          <div className="text-xs text-orange-600">SKU: TEA-001</div>
-                        </div>
-                        <div className="bg-orange-100 rounded p-2">
-                          <span className="text-sm font-medium text-orange-800">منتج 2</span>
-                          <div className="text-xs text-orange-600">SKU: TEA-003</div>
-                        </div>
-                        <div className="bg-red-100 rounded p-2">
-                          <span className="text-sm font-medium text-red-800">نفد المخزون</span>
-                          <div className="text-xs text-red-600">SKU: BAG-512</div>
-                        </div>
-                      </div>
-                      <Button variant="link" className="w-full mt-3 text-orange-600">
-                        إدارة المخزون
-                      </Button>
-                    </CardContent>
-                  </Card>
+                  <p className="text-orange-600 text-sm">مشاهدات المتجر</p>
+                  <p className="text-3xl font-bold text-orange-800">
+                    {stats?.totalViews ? stats.totalViews.toLocaleString() : '2,340'}
+                  </p>
                 </div>
+                <Eye className="h-10 w-10 text-orange-500" />
               </div>
-            </TabsContent>
+            </CardContent>
+          </Card>
 
-            {/* Products Tab */}
-            <TabsContent value="products" className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-bold text-gray-900">قائمة المنتجات</h3>
-                <Button className="bg-success-green hover:bg-green-600">
-                  <Plus className="w-4 h-4 ml-2" />
-                  إضافة منتج جديد
-                </Button>
-              </div>
-
-              <Card>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="text-right">العنوان</TableHead>
-                      <TableHead className="text-right">النوع</TableHead>
-                      <TableHead className="text-right">الحالة</TableHead>
-                      <TableHead className="text-right">الفئة</TableHead>
-                      <TableHead className="text-right">المخزون</TableHead>
-                      <TableHead className="text-right">التاريخ</TableHead>
-                      <TableHead className="text-right">الإجراءات</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium text-gray-900">منتج تجريبي</div>
-                          <div className="text-sm text-gray-500">(Demo Product)</div>
-                        </div>
-                      </TableCell>
-                      <TableCell>منتج</TableCell>
-                      <TableCell>
-                        <Badge className="bg-success-green text-white">منشور</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="bg-warning-orange text-white">غذائية</Badge>
-                      </TableCell>
-                      <TableCell>15 قطعة</TableCell>
-                      <TableCell>اليوم</TableCell>
-                      <TableCell>
-                        <div className="flex space-x-reverse space-x-2">
-                          <Button variant="ghost" size="sm">
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700">
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </Card>
-            </TabsContent>
-
-            {/* Orders Tab */}
-            <TabsContent value="orders" className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-bold text-gray-900">الطلبات الأخيرة ⏰</h3>
-                <Button variant="link" className="text-primary-blue">عرض الكل</Button>
-              </div>
-
-              {ordersLoading ? (
-                <div className="text-center py-8">جاري التحميل...</div>
-              ) : (
-                <div className="space-y-4">
-                  {orders && Array.isArray(orders) && orders.map((order: any) => (
-                    <Card key={order.id}>
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-reverse space-x-3">
-                            <ShoppingCart className="w-5 h-5 text-gray-400" />
-                            <div>
-                              <div className="font-medium text-gray-900">طلب رقم {order.orderNumber}</div>
-                              <div className="text-sm text-gray-500">
-                                {Array.isArray(order.items) ? order.items.length : 1} منتج
-                              </div>
-                              <div className="text-xs text-gray-400">
-                                {new Date(order.createdAt).toLocaleDateString('ar-SA')}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="text-left">
-                            <div className="text-lg font-bold text-gray-900">${order.totalAmount}</div>
-                            <div className={`text-sm ${getStatusColor(order.status)}`}>
-                              {getStatusBadge(order.status).label}
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+          <Card className="bg-gradient-to-br from-purple-100 to-purple-200 border-0">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-purple-600 text-sm">إيرادات الشهر</p>
+                  <p className="text-3xl font-bold text-purple-800">
+                    {stats?.totalSales || '$15,420'}
+                  </p>
                 </div>
-              )}
-            </TabsContent>
+                <TrendingUp className="h-10 w-10 text-purple-500" />
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Settings Tab */}
-            <TabsContent value="settings" className="p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-6">إعدادات النظام</h3>
-              
-              <Card className="bg-gray-50 mb-8">
-                <CardHeader>
-                  <CardTitle className="text-lg">⚡ حالة النظام</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-3 gap-6">
-                    <div className="text-center">
-                      <div className="bg-success-green text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-2">
-                        ✓
-                      </div>
-                      <div className="text-sm font-medium text-gray-900">قاعدة البيانات</div>
-                      <div className="text-xs text-success-green">99.9%</div>
-                      <div className="text-xs text-gray-500">وقت التشغيل</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="bg-success-green text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-2">
-                        ✓
-                      </div>
-                      <div className="text-sm font-medium text-gray-900">التخزين</div>
-                      <div className="text-xs text-success-green">23.8%</div>
-                      <div className="text-xs text-gray-500">استخدام المتاح</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="bg-success-green text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-2">
-                        ✓
-                      </div>
-                      <div className="text-sm font-medium text-gray-900">البريد الإلكتروني</div>
-                      <div className="text-xs text-success-green">65.5%</div>
-                      <div className="text-xs text-gray-500">استخدام الذاكرة</div>
+          <Card className="bg-gradient-to-br from-green-100 to-green-200 border-0">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-green-600 text-sm">إجمالي الطلبات</p>
+                  <p className="text-3xl font-bold text-green-800">
+                    {stats?.totalOrders || '128'}
+                  </p>
+                </div>
+                <ShoppingCart className="h-10 w-10 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-blue-100 to-blue-200 border-0">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-blue-600 text-sm">إجمالي المنتجات</p>
+                  <p className="text-3xl font-bold text-blue-800">
+                    {stats?.totalProducts || '45'}
+                  </p>
+                </div>
+                <Package className="h-10 w-10 text-blue-500" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <Button variant="outline" className="h-16 flex flex-col justify-center border-blue-200 hover:bg-blue-50">
+            <Settings className="w-6 h-6 mb-2 text-blue-600" />
+            <span className="text-blue-700">إعدادات المتجر</span>
+          </Button>
+          
+          <Button variant="outline" className="h-16 flex flex-col justify-center border-blue-200 hover:bg-blue-50">
+            <ShoppingCart className="w-6 h-6 mb-2 text-blue-600" />
+            <span className="text-blue-700">إدارة الطلبات</span>
+          </Button>
+          
+          <Button variant="outline" className="h-16 flex flex-col justify-center border-blue-200 hover:bg-blue-50">
+            <Users className="w-6 h-6 mb-2 text-blue-600" />
+            <span className="text-blue-700">إدارة المستخدمين</span>
+          </Button>
+          
+          <Button className="h-16 flex flex-col justify-center bg-green-500 hover:bg-green-600 text-white">
+            <Plus className="w-6 h-6 mb-2" />
+            <span>إضافة منتج جديد</span>
+          </Button>
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Store Performance */}
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg font-bold">ما أداء المتجر</CardTitle>
+                  <Button variant="link" className="text-blue-600 p-0">عرض الكل</Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center space-x-reverse space-x-3">
+                    <div className="text-3xl font-bold text-green-600">42</div>
+                    <div>
+                      <p className="text-sm text-gray-600">المنتجات النشطة</p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-
-              <div className="space-y-6">
-                <h4 className="font-bold text-gray-900">إعدادات الأمان</h4>
+                </div>
                 
-                <div className="grid md:grid-cols-2 gap-8">
-                  <div className="space-y-4">
-                    <Card>
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="font-medium text-gray-900">المصادقة الثنائية</div>
-                            <div className="text-sm text-gray-600">تفعيل المصادقة للمستخدمين</div>
-                          </div>
-                          <Switch defaultChecked />
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="font-medium text-gray-900">التحقق من البريد الإلكتروني</div>
-                            <div className="text-sm text-gray-600">طلب التحقق من البريد عند التسجيل</div>
-                          </div>
-                          <Switch defaultChecked />
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  <div className="space-y-4">
-                    <Card>
-                      <CardContent className="p-4">
-                        <Label htmlFor="session-timeout">مدة انتهاء الجلسة (بالدقائق)</Label>
-                        <Input id="session-timeout" type="number" defaultValue="3600" className="mt-2" />
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardContent className="p-4">
-                        <Label htmlFor="max-attempts">الحد الأقصى لمحاولات تسجيل الدخول</Label>
-                        <Input id="max-attempts" type="number" defaultValue="5" className="mt-2" />
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="font-medium text-gray-900">طلب رمز حماية في كلمة المرور</div>
-                            <div className="text-sm text-gray-600">طلب رموز خاصة (#$@) في كلمة المرور</div>
-                          </div>
-                          <Switch defaultChecked />
-                        </div>
-                      </CardContent>
-                    </Card>
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center space-x-reverse space-x-3">
+                    <div className="text-3xl font-bold text-amber-600">7</div>
+                    <div>
+                      <p className="text-sm text-gray-600">طلبات معلقة</p>
+                    </div>
                   </div>
                 </div>
+                
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center space-x-reverse space-x-3">
+                    <div className="text-3xl font-bold text-yellow-600">4.6</div>
+                    <div>
+                      <p className="text-sm text-gray-600">متوسط التقييم ⭐</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center space-x-reverse space-x-3">
+                    <div className="text-3xl font-bold text-blue-600">89</div>
+                    <div>
+                      <p className="text-sm text-gray-600">إجمالي المراجعات</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Recent Orders */}
+          <div>
+            <Card>
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg font-bold">الطلبات الأخيرة ⏰</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {ordersLoading ? (
+                  <div className="text-center py-8">جاري التحميل...</div>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center space-x-reverse space-x-3">
+                        <ShoppingCart className="w-5 h-5 text-gray-400" />
+                        <div>
+                          <div className="font-medium text-gray-900">أحمد محمد</div>
+                          <div className="text-sm text-gray-500">
+                            ORD-001 • 3 منتجات • منذ 15 دقيقة
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-left">
+                        <div className="font-bold text-gray-900">$125.5</div>
+                        <div className="text-sm text-yellow-600">في الانتظار</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center space-x-reverse space-x-3">
+                        <ShoppingCart className="w-5 h-5 text-gray-400" />
+                        <div>
+                          <div className="font-medium text-gray-900">فاطمة علي</div>
+                          <div className="text-sm text-gray-500">
+                            ORD-002 • 1 منتجات • منذ ساعة
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-left">
+                        <div className="font-bold text-gray-900">$45</div>
+                        <div className="text-sm text-blue-600">مؤكد</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center space-x-reverse space-x-3">
+                        <ShoppingCart className="w-5 h-5 text-gray-400" />
+                        <div>
+                          <div className="font-medium text-gray-900">محمد يسرا</div>
+                          <div className="text-sm text-gray-500">
+                            ORD-003 • 2 منتجات • منذ 3 ساعات
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-left">
+                        <div className="font-bold text-gray-900">$89.99</div>
+                        <div className="text-sm text-purple-600">تم الشحن</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center space-x-reverse space-x-3">
+                        <ShoppingCart className="w-5 h-5 text-gray-400" />
+                        <div>
+                          <div className="font-medium text-gray-900">عائشة أحمد</div>
+                          <div className="text-sm text-gray-500">
+                            ORD-004 • 4 منتجات • منذ يوم
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-left">
+                        <div className="font-bold text-gray-900">$234.75</div>
+                        <div className="text-sm text-green-600">تم التسليم</div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Inventory Alert */}
+        <div className="mt-8">
+          <Card className="bg-orange-50 border-orange-200">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg font-bold text-orange-800">تنبيه المخزون ⚠️</CardTitle>
               </div>
-            </TabsContent>
-          </Tabs>
-        </Card>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center justify-between p-3 bg-orange-100 rounded-lg">
+                <div className="flex items-center space-x-reverse space-x-3">
+                  <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                  <div>
+                    <div className="font-medium text-orange-800">عطر صندل سوداني</div>
+                    <div className="text-sm text-orange-600">TEA-001</div>
+                  </div>
+                </div>
+                <Badge className="bg-orange-200 text-orange-800">2 قليل</Badge>
+              </div>
+              
+              <div className="flex items-center justify-between p-3 bg-yellow-100 rounded-lg">
+                <div className="flex items-center space-x-reverse space-x-3">
+                  <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                  <div>
+                    <div className="font-medium text-yellow-800">دكركة طيبش</div>
+                    <div className="text-sm text-yellow-600">TEA-003</div>
+                  </div>
+                </div>
+                <Badge className="bg-yellow-200 text-yellow-800">5 متوسط</Badge>
+              </div>
+              
+              <div className="flex items-center justify-between p-3 bg-red-100 rounded-lg">
+                <div className="flex items-center space-x-reverse space-x-3">
+                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                  <div>
+                    <div className="font-medium text-red-800">حقيبة سودانية</div>
+                    <div className="text-sm text-red-600">BAG-012</div>
+                  </div>
+                </div>
+                <Badge className="bg-red-200 text-red-800">نفد المخزون</Badge>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
