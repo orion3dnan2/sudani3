@@ -14,26 +14,6 @@ export default function Navbar() {
 
   return (
     <nav className="bg-white shadow-sm border-b">
-      {/* Top row with minor info */}
-      <div className="bg-gray-50 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-10 text-sm">
-            <div className="flex items-center space-x-reverse space-x-4 text-gray-600">
-              <span>يج</span>
-              <span>£</span>
-              <span>🌞</span>
-              <span>القطيفة</span>
-              <span>🌐</span>
-            </div>
-            <div className="flex items-center space-x-reverse space-x-4 text-gray-600">
-              <span>مرحبا بكم في البيت السوداني</span>
-              <span>🇸🇩</span>
-              <span>⚙️</span>
-              <span>🔔</span>
-            </div>
-          </div>
-        </div>
-      </div>
       {/* Main navigation row */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
