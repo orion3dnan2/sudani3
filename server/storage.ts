@@ -330,4 +330,17 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Use Database Storage if available, otherwise Memory Storage
+async function createStorage() {
+  try {
+    if (process.env.DATABASE_URL && process.env.USE_DATABASE === 'true') {
+      const { DatabaseStorage } = await import('./db-storage');
+      return new DatabaseStorage();
+    }
+  } catch (error) {
+    console.log('Database not available, using memory storage:', error);
+  }
+  return new MemStorage();
+}
+
+export const storage = new MemStorage(); // Default to memory for now
