@@ -23,12 +23,7 @@ export default function Navbar() {
               SD
             </div>
             <div>
-              <div className="flex items-center space-x-1">
-                <h1 className="text-xl font-bold text-gray-900">البيت</h1>
-              </div>
-              <div className="flex items-center space-x-1">
-                <h2 className="text-xl font-bold text-gray-900">السوداني</h2>
-              </div>
+              <h1 className="text-xl font-bold text-gray-900">البيت</h1>
               <p className="text-xs text-gray-500">سوق وخدمات السودان</p>
             </div>
           </div>
