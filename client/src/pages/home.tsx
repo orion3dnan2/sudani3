@@ -19,7 +19,7 @@ export default function Home() {
                   المتجر الآن
                 </Button>
               </Link>
-              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-gray-900 px-6 py-3">
+              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-gray-900 px-6 py-3 bg-[#182e09]">
                 المزيد ←
               </Button>
             </div>
