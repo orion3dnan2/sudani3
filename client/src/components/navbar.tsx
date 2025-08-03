@@ -20,7 +20,7 @@ export default function Navbar() {
               SD
             </div>
             <div className="mr-3">
-              <h1 className="text-lg font-bold text-gray-900">القفة السودانية</h1>
+              <h1 className="text-lg font-bold text-gray-900">البيت السوداني</h1>
               <p className="text-xs text-gray-500">سوق وخدمات سودانية</p>
             </div>
           </div>

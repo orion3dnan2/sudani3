@@ -29,9 +29,9 @@ export default function Footer() {
             </div>
           </div>
           <div>
-            <h3 className="font-bold text-lg mb-4">القفة السودانية</h3>
+            <h3 className="font-bold text-lg mb-4">البيت السوداني</h3>
             <p className="text-gray-300 mb-4">منصة خدمات وتجارات سودانية في الخليج والعالم</p>
-            <p className="text-xs text-gray-400">© 2024 القفة السودانية. جميع الحقوق محفوظة.</p>
+            <p className="text-xs text-gray-400">© 2024 البيت السوداني. جميع الحقوق محفوظة.</p>
           </div>
         </div>
       </div>
