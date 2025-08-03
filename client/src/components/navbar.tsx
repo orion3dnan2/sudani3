@@ -1,5 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search, Sun, Bell, User } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
 export default function Navbar() {
@@ -12,37 +14,92 @@ export default function Navbar() {
 
   return (
     <nav className="bg-white shadow-sm border-b">
+      {/* Top row with minor info */}
+      <div className="bg-gray-50 border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-10 text-sm">
+            <div className="flex items-center space-x-reverse space-x-4 text-gray-600">
+              <span>100+ تاجر يتداولون في الخليج</span>
+              <span>£</span>
+              <span>🌞</span>
+              <span>القطيفة</span>
+              <span>🌐</span>
+            </div>
+            <div className="flex items-center space-x-reverse space-x-4 text-gray-600">
+              <span>مرحبا بكم في البيت السوداني</span>
+              <span>🇸🇩</span>
+              <span>⚙️</span>
+              <span>🔔</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main navigation row */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <div className="bg-primary-blue text-white rounded-lg w-10 h-10 flex items-center justify-center font-bold text-sm">
+            <div className="bg-teal-600 text-white rounded-lg w-12 h-12 flex items-center justify-center font-bold text-lg mr-3">
               SD
             </div>
-            <div className="mr-3">
-              <h1 className="text-lg font-bold text-gray-900">القفة السودانية</h1>
-              <p className="text-xs text-gray-500">سوق وخدمات سودانية</p>
+            <div>
+              <div className="flex items-center space-x-1">
+                <h1 className="text-xl font-bold text-gray-900">البيت</h1>
+              </div>
+              <div className="flex items-center space-x-1">
+                <h2 className="text-xl font-bold text-gray-900">السوداني</h2>
+              </div>
+              <p className="text-xs text-gray-500">سوق وخدمات السودان</p>
             </div>
           </div>
 
           {/* Main Navigation */}
-          <div className="hidden md:flex items-center space-x-reverse space-x-8">
-            <Link href="/" className={`transition-colors ${location === '/' ? 'text-primary-blue' : 'text-gray-700 hover:text-primary-blue'}`}>
-              الرئيسية
+          <div className="hidden lg:flex items-center space-x-reverse space-x-6">
+            <Link href="/" className={`text-sm font-medium transition-colors px-3 py-2 rounded-full ${location === '/' ? 'text-white bg-blue-600' : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'}`}>
+              🏠 الرئيسية
             </Link>
-            <Link href="/market" className={`transition-colors ${location === '/market' ? 'text-primary-blue' : 'text-gray-700 hover:text-primary-blue'}`}>
-              السوق
+            <Link href="/market" className={`text-sm font-medium transition-colors px-3 py-2 rounded-full ${location === '/market' ? 'text-white bg-blue-600' : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'}`}>
+              🛒 السوق
             </Link>
-            <Link href="/services" className={`transition-colors ${location === '/services' ? 'text-primary-blue' : 'text-gray-700 hover:text-primary-blue'}`}>
-              الخدمات
+            <Link href="/stores" className={`text-sm font-medium transition-colors px-3 py-2 rounded-full ${location === '/stores' ? 'text-white bg-blue-600' : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'}`}>
+              🏪 المتاجر
             </Link>
+            <Link href="/jobs" className={`text-sm font-medium transition-colors px-3 py-2 rounded-full ${location === '/jobs' ? 'text-white bg-blue-600' : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'}`}>
+              💼 الوظائف
+            </Link>
+            <Link href="/restaurants" className={`text-sm font-medium transition-colors px-3 py-2 rounded-full ${location === '/restaurants' ? 'text-white bg-blue-600' : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'}`}>
+              🍽️ المطاعم
+            </Link>
+            <Link href="/services" className={`text-sm font-medium transition-colors px-3 py-2 rounded-full ${location === '/services' ? 'text-white bg-blue-600' : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'}`}>
+              🔧 الخدمات
+            </Link>
+            <Link href="/ads" className={`text-sm font-medium transition-colors px-3 py-2 rounded-full ${location === '/ads' ? 'text-white bg-blue-600' : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'}`}>
+              📢 إعلانات
+            </Link>
+          </div>
+
+          {/* Search Bar */}
+          <div className="hidden md:flex flex-1 max-w-lg mx-8">
+            <div className="relative w-full">
+              <Input
+                type="text"
+                placeholder="أبحث في البيت السوداني..."
+                className="w-full pl-10 pr-4 py-2 rounded-full border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+              />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            </div>
           </div>
 
           {/* User Actions */}
           <div className="flex items-center space-x-reverse space-x-4">
             {isAuthenticated ? (
               <>
-                <span className="text-sm text-gray-600">مرحباً، {user?.fullName}</span>
+                <div className="flex items-center space-x-reverse space-x-2">
+                  <Bell className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-600" />
+                  <User className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-600" />
+                  <span className="text-sm text-gray-600">{user?.fullName}</span>
+                </div>
                 {user?.role === 'merchant' || user?.role === 'admin' ? (
                   <Link href="/dashboard">
                     <Button variant="outline" size="sm">
@@ -51,22 +108,15 @@ export default function Navbar() {
                   </Link>
                 ) : null}
                 <Button onClick={handleLogout} variant="outline" size="sm">
-                  تسجيل الخروج
+                  خروج
                 </Button>
               </>
             ) : (
-              <>
-                <Link href="/login">
-                  <Button className="bg-primary-blue hover:bg-blue-600">
-                    تسجيل الدخول
-                  </Button>
-                </Link>
-                <Link href="/register">
-                  <Button variant="outline" className="border-primary-blue text-primary-blue hover:bg-blue-50">
-                    حساب جديد
-                  </Button>
-                </Link>
-              </>
+              <Link href="/login">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6">
+                  دخول
+                </Button>
+              </Link>
             )}
           </div>
         </div>
