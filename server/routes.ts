@@ -35,6 +35,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           email: user.email,
           fullName: user.fullName,
           role: user.role,
+          phone: user.phone,
+          country: user.country,
+          city: user.city,
         }
       });
     } catch (error) {
@@ -87,6 +90,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           email: user.email,
           fullName: user.fullName,
           role: user.role,
+          phone: user.phone,
+          country: user.country,
+          city: user.city,
         }
       });
     } catch (error) {

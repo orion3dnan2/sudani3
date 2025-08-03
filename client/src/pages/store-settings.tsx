@@ -383,23 +383,33 @@ export default function StoreSettings() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
                         <Label className="text-sm text-gray-600">رقم الهاتف</Label>
-                        <div className="mt-1 p-2 bg-white border border-gray-200 rounded-md text-sm">
+                        <div className="mt-1 p-2 bg-white border border-gray-200 rounded-md text-sm flex items-center">
+                          <Phone className="w-4 h-4 ml-2 text-gray-500" />
                           {user?.phone || "غير محدد"}
                         </div>
                       </div>
                       <div>
                         <Label className="text-sm text-gray-600">البريد الإلكتروني</Label>
-                        <div className="mt-1 p-2 bg-white border border-gray-200 rounded-md text-sm">
+                        <div className="mt-1 p-2 bg-white border border-gray-200 rounded-md text-sm flex items-center">
+                          <Mail className="w-4 h-4 ml-2 text-gray-500" />
                           {user?.email || "غير محدد"}
                         </div>
                       </div>
                       <div>
                         <Label className="text-sm text-gray-600">الدولة/المدينة</Label>
-                        <div className="mt-1 p-2 bg-white border border-gray-200 rounded-md text-sm">
+                        <div className="mt-1 p-2 bg-white border border-gray-200 rounded-md text-sm flex items-center">
+                          <MapPin className="w-4 h-4 ml-2 text-gray-500" />
                           {user?.city && user?.country ? `${user.city} - ${user.country}` : "غير محدد"}
                         </div>
                       </div>
                     </div>
+                    {(!user?.phone || !user?.country) && (
+                      <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                        <p className="text-sm text-blue-700">
+                          💡 لتحديث معلومات الاتصال، قم بتسجيل الخروج ثم تسجيل الدخول مرة أخرى لتحديث البيانات
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   <div>
