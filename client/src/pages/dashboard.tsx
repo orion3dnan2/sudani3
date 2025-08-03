@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Eye, TrendingUp, ShoppingCart, Package, Settings, Users, Plus, Download } from "lucide-react";
+import { Eye, TrendingUp, ShoppingCart, Package, Settings, Plus, Download } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useQuery } from "@tanstack/react-query";
 
@@ -125,10 +125,10 @@ export default function Dashboard() {
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Button variant="outline" className="h-16 flex flex-col justify-center border-blue-200 hover:bg-blue-50">
-            <Settings className="w-6 h-6 mb-2 text-blue-600" />
-            <span className="text-blue-700">إعدادات المتجر</span>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <Button className="h-16 flex flex-col justify-center bg-green-500 hover:bg-green-600 text-white">
+            <Plus className="w-6 h-6 mb-2" />
+            <span>إضافة منتج جديد</span>
           </Button>
           
           <Button variant="outline" className="h-16 flex flex-col justify-center border-blue-200 hover:bg-blue-50">
@@ -137,13 +137,8 @@ export default function Dashboard() {
           </Button>
           
           <Button variant="outline" className="h-16 flex flex-col justify-center border-blue-200 hover:bg-blue-50">
-            <Users className="w-6 h-6 mb-2 text-blue-600" />
-            <span className="text-blue-700">إدارة المستخدمين</span>
-          </Button>
-          
-          <Button className="h-16 flex flex-col justify-center bg-green-500 hover:bg-green-600 text-white">
-            <Plus className="w-6 h-6 mb-2" />
-            <span>إضافة منتج جديد</span>
+            <Settings className="w-6 h-6 mb-2 text-blue-600" />
+            <span className="text-blue-700">إعدادات المتجر</span>
           </Button>
         </div>
 
