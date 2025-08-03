@@ -126,7 +126,10 @@ export default function Dashboard() {
 
         {/* Action Buttons */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Button className="h-16 flex flex-col justify-center bg-green-500 hover:bg-green-600 text-white">
+          <Button 
+            className="h-16 flex flex-col justify-center bg-green-500 hover:bg-green-600 text-white"
+            onClick={() => setLocation("/add-product")}
+          >
             <Plus className="w-6 h-6 mb-2" />
             <span>إضافة منتج جديد</span>
           </Button>

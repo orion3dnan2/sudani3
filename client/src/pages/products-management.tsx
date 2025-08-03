@@ -48,7 +48,10 @@ export default function ProductsManagement() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-reverse space-x-4">
-              <Button className="bg-blue-500 hover:bg-blue-600 text-white">
+              <Button 
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+                onClick={() => setLocation("/add-product")}
+              >
                 <Plus className="w-4 h-4 ml-2" />
                 إضافة منتج جديد
               </Button>
@@ -255,7 +258,10 @@ export default function ProductsManagement() {
             <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">لا توجد منتجات</h3>
             <p className="text-gray-500 mb-4">لم يتم العثور على منتجات تطابق معايير البحث</p>
-            <Button className="bg-blue-500 hover:bg-blue-600">
+            <Button 
+              className="bg-blue-500 hover:bg-blue-600"
+              onClick={() => setLocation("/add-product")}
+            >
               <Plus className="w-4 h-4 ml-2" />
               إضافة منتج جديد
             </Button>

@@ -11,6 +11,7 @@ import Market from "@/pages/market";
 import Dashboard from "@/pages/dashboard";
 import Services from "@/pages/services";
 import ProductsManagement from "@/pages/products-management";
+import AddProduct from "@/pages/add-product";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { useLocation } from "wouter";
@@ -31,6 +32,7 @@ function Router() {
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/services" component={Services} />
           <Route path="/products-management" component={ProductsManagement} />
+          <Route path="/add-product" component={AddProduct} />
           <Route component={NotFound} />
         </Switch>
       </main>

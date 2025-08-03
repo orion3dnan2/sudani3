@@ -140,6 +140,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/products", async (req, res) => {
+    try {
+      const productData = req.body;
+      
+      // For demo purposes, use the first available store
+      const stores = await storage.getStoresByOwner("109fb3f0-f57b-4976-8d9b-07e9d91eedae"); // merchant user ID
+      if (stores.length === 0) {
+        return res.status(400).json({ message: "لا يوجد متجر مرتبط بهذا المستخدم" });
+      }
+
+      const product = await storage.createProduct({
+        ...productData,
+        storeId: stores[0].id,
+        isActive: true,
+      });
+
+      res.status(201).json(product);
+    } catch (error) {
+      console.error("Error creating product:", error);
+      res.status(500).json({ message: "خطأ في إنشاء المنتج" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
