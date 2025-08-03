@@ -185,6 +185,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/stores/:storeId", async (req, res) => {
+    try {
+      const { storeId } = req.params;
+      const updateData = req.body;
+      
+      const updatedStore = await storage.updateStore(storeId, updateData);
+      
+      if (!updatedStore) {
+        return res.status(404).json({ message: "المتجر غير موجود" });
+      }
+      
+      res.json(updatedStore);
+    } catch (error) {
+      console.error("Error updating store:", error);
+      res.status(500).json({ message: "خطأ في تحديث المتجر" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

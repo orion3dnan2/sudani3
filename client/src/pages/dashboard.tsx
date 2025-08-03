@@ -148,7 +148,11 @@ export default function Dashboard() {
             <span className="text-blue-700">إدارة الطلبات</span>
           </Button>
           
-          <Button variant="outline" className="h-16 flex flex-col justify-center border-blue-200 hover:bg-blue-50">
+          <Button 
+            variant="outline" 
+            className="h-16 flex flex-col justify-center border-blue-200 hover:bg-blue-50"
+            onClick={() => setLocation("/store-settings")}
+          >
             <Settings className="w-6 h-6 mb-2 text-blue-600" />
             <span className="text-blue-700">إعدادات المتجر</span>
           </Button>

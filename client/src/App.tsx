@@ -12,6 +12,7 @@ import Dashboard from "@/pages/dashboard";
 import Services from "@/pages/services";
 import ProductsManagement from "@/pages/products-management";
 import AddProduct from "@/pages/add-product";
+import StoreSettings from "@/pages/store-settings";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { useLocation } from "wouter";
@@ -33,6 +34,7 @@ function Router() {
           <Route path="/services" component={Services} />
           <Route path="/products-management" component={ProductsManagement} />
           <Route path="/add-product" component={AddProduct} />
+          <Route path="/store-settings" component={StoreSettings} />
           <Route component={NotFound} />
         </Switch>
       </main>
