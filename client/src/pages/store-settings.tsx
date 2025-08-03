@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,11 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, Store, Package, ShoppingBag, MapPin, Phone, Mail, Clock, Settings } from "lucide-react";
+import { ArrowLeft, Store, Package, ShoppingBag, MapPin, Phone, Mail, Clock, Settings, Upload, Image } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useToast } from "@/hooks/use-toast";
 import * as z from "zod";
 
 const storeSettingsSchema = z.object({
@@ -43,7 +44,12 @@ export default function StoreSettings() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const {
     register,
@@ -83,7 +89,7 @@ export default function StoreSettings() {
 
   // Load store data into form
   useEffect(() => {
-    if (stores && stores.length > 0) {
+    if (stores && Array.isArray(stores) && stores.length > 0) {
       const store = stores[0];
       reset({
         name: store.name || "",
@@ -98,13 +104,21 @@ export default function StoreSettings() {
         workingDays: store.settings?.workingDays || [],
       });
       setSelectedDays(store.settings?.workingDays || []);
+      
+      // Set select values programmatically
+      if (store.settings?.category) {
+        setValue("category", store.settings.category);
+      }
+      if (store.settings?.city) {
+        setValue("city", store.settings.city);
+      }
     }
   }, [stores, reset]);
 
   // Update store mutation
   const updateStoreMutation = useMutation({
     mutationFn: async (data: StoreSettingsFormData) => {
-      if (!stores || stores.length === 0) {
+      if (!stores || !Array.isArray(stores) || stores.length === 0) {
         throw new Error('لا يوجد متجر للتحديث');
       }
 
@@ -137,6 +151,17 @@ export default function StoreSettings() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/stores/owner"] });
+      toast({
+        title: "تم حفظ التغييرات",
+        description: "تم تحديث إعدادات المتجر بنجاح",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "خطأ في الحفظ",
+        description: error.message || "فشل في تحديث إعدادات المتجر",
+        variant: "destructive",
+      });
     },
   });
 
@@ -152,6 +177,38 @@ export default function StoreSettings() {
       setValue("workingDays", newDays);
       return newDays;
     });
+  };
+
+  const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setLogoPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+      
+      toast({
+        title: "تم تحديد الشعار",
+        description: "سيتم حفظ الشعار عند حفظ التغييرات",
+      });
+    }
+  };
+
+  const handleCoverChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setCoverPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+      
+      toast({
+        title: "تم تحديد الغلاف",
+        description: "سيتم حفظ الغلاف عند حفظ التغييرات",
+      });
+    }
   };
 
   if (!user) return null;
@@ -178,7 +235,7 @@ export default function StoreSettings() {
                 className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
               >
                 <ArrowLeft className="w-4 h-4 ml-1" />
-                common.back
+                رجوع
               </Button>
             </div>
           </div>
@@ -223,26 +280,64 @@ export default function StoreSettings() {
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <Label htmlFor="storeName">شعار المتجر</Label>
+                      <Label htmlFor="storeLogo">شعار المتجر</Label>
                       <div className="flex items-center space-x-reverse space-x-4">
-                        <div className="w-16 h-16 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
-                          <Store className="w-6 h-6 text-gray-400" />
+                        <div className="w-16 h-16 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
+                          {logoPreview ? (
+                            <img src={logoPreview} alt="شعار المتجر" className="w-full h-full object-cover" />
+                          ) : (
+                            <Store className="w-6 h-6 text-gray-400" />
+                          )}
                         </div>
-                        <Button variant="outline" size="sm">
-                          تغيير الشعار
-                        </Button>
+                        <div className="flex flex-col space-y-2">
+                          <Button 
+                            type="button"
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => logoInputRef.current?.click()}
+                          >
+                            <Upload className="w-4 h-4 ml-1" />
+                            تغيير الشعار
+                          </Button>
+                          <input
+                            type="file"
+                            ref={logoInputRef}
+                            onChange={handleLogoChange}
+                            accept="image/*"
+                            className="hidden"
+                          />
+                        </div>
                       </div>
                     </div>
                     
                     <div>
-                      <Label htmlFor="packageIcon">غلاف المتجر</Label>
+                      <Label htmlFor="storeCover">غلاف المتجر</Label>
                       <div className="flex items-center space-x-reverse space-x-4">
-                        <div className="w-16 h-16 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
-                          <Package className="w-6 h-6 text-gray-400" />
+                        <div className="w-16 h-16 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center overflow-hidden">
+                          {coverPreview ? (
+                            <img src={coverPreview} alt="غلاف المتجر" className="w-full h-full object-cover" />
+                          ) : (
+                            <Image className="w-6 h-6 text-gray-400" />
+                          )}
                         </div>
-                        <Button variant="outline" size="sm">
-                          تغيير الغلاف
-                        </Button>
+                        <div className="flex flex-col space-y-2">
+                          <Button 
+                            type="button"
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => coverInputRef.current?.click()}
+                          >
+                            <Upload className="w-4 h-4 ml-1" />
+                            تغيير الغلاف
+                          </Button>
+                          <input
+                            type="file"
+                            ref={coverInputRef}
+                            onChange={handleCoverChange}
+                            accept="image/*"
+                            className="hidden"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
