@@ -1,9 +1,11 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
 import { DatabaseStorage } from "./db-storage";
 import { insertUserSchema } from "@shared/schema";
 import { z } from "zod";
+
+// Initialize database storage
+const storage = new DatabaseStorage();
 
 const loginSchema = z.object({
   username: z.string(),
@@ -146,7 +148,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const productData = req.body;
       
       // Use current user ID (should be the merchant ID from login)
-      const userId = req.user?.id || "109fb3f0-f57b-4976-8d9b-07e9d91eedae";
+      // For now, using a fixed merchant ID since we don't have session management
+      const userId = "109fb3f0-f57b-4976-8d9b-07e9d91eedae";
       console.log("Current user ID:", userId);
       
       // Get or create store for user

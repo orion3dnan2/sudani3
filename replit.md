@@ -32,10 +32,11 @@ Preferred communication style: Simple, everyday language.
 - **Relationships**: Foreign key relationships between users, stores, products, and orders
 
 ## Authentication System
-- **Storage**: In-memory storage implementation (MemStorage) for development
+- **Storage**: PostgreSQL database storage with persistent data
 - **User Roles**: Role-based access control with customer, merchant, and admin levels
 - **Session Management**: Basic authentication without proper session handling (needs enhancement)
-- **Registration**: User registration with role selection and account activation
+- **Registration**: User registration with role selection and automatic account activation
+- **Demo Accounts**: Seeded with admin (admin/admin123) and merchant (merchant/merchant123) users
 
 ## Development Environment
 - **Build System**: Vite with React plugin and TypeScript support
@@ -53,6 +54,8 @@ Preferred communication style: Simple, everyday language.
 ## Database
 - **PostgreSQL**: Primary database using Neon serverless PostgreSQL (@neondatabase/serverless)
 - **Migration System**: Drizzle Kit for database migrations and schema management
+- **Data Persistence**: Full data persistence enabled with database storage
+- **Seeded Data**: Demo users, stores, and products pre-loaded for testing
 
 ## UI Framework
 - **Radix UI**: Complete suite of unstyled, accessible UI primitives

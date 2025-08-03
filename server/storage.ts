@@ -194,6 +194,11 @@ export class MemStorage implements IStorage {
     const user: User = { 
       ...insertUser, 
       id, 
+      phone: insertUser.phone ?? null,
+      country: insertUser.country ?? null,
+      city: insertUser.city ?? null,
+      role: insertUser.role ?? "customer",
+      isActive: insertUser.isActive ?? true,
       createdAt: new Date() 
     };
     this.users.set(id, user);
@@ -222,6 +227,9 @@ export class MemStorage implements IStorage {
     const store: Store = { 
       ...insertStore, 
       id, 
+      description: insertStore.description ?? null,
+      isActive: insertStore.isActive ?? true,
+      settings: insertStore.settings ?? {},
       createdAt: new Date() 
     };
     this.stores.set(id, store);
@@ -250,6 +258,14 @@ export class MemStorage implements IStorage {
     const product: Product = { 
       ...insertProduct, 
       id, 
+      description: insertProduct.description ?? null,
+      stock: insertProduct.stock ?? 0,
+      weight: insertProduct.weight ?? null,
+      dimensions: insertProduct.dimensions ?? null,
+      specifications: insertProduct.specifications ?? null,
+      tags: insertProduct.tags ?? null,
+      isActive: insertProduct.isActive ?? true,
+      image: insertProduct.image ?? null,
       createdAt: new Date() 
     };
     this.products.set(id, product);
@@ -284,6 +300,8 @@ export class MemStorage implements IStorage {
       ...insertOrder, 
       id, 
       orderNumber,
+      status: insertOrder.status ?? "pending",
+      shippingAddress: insertOrder.shippingAddress ?? {},
       createdAt: new Date() 
     };
     this.orders.set(id, order);
@@ -333,7 +351,7 @@ export class MemStorage implements IStorage {
 // Use Database Storage if available, otherwise Memory Storage
 async function createStorage() {
   try {
-    if (process.env.DATABASE_URL && process.env.USE_DATABASE === 'true') {
+    if (process.env.DATABASE_URL) {
       const { DatabaseStorage } = await import('./db-storage');
       return new DatabaseStorage();
     }
@@ -343,4 +361,5 @@ async function createStorage() {
   return new MemStorage();
 }
 
-export const storage = new MemStorage(); // Default to memory for now
+export const storage = new MemStorage(); // Initialize immediately with memory storage
+createStorage().then(s => Object.assign(storage, s));
