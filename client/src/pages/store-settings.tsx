@@ -19,10 +19,7 @@ const storeSettingsSchema = z.object({
   name: z.string().min(1, "اسم المتجر مطلوب"),
   description: z.string().min(10, "وصف المتجر يجب أن يكون 10 أحرف على الأقل"),
   category: z.string().min(1, "فئة المتجر مطلوبة"),
-  email: z.string().email("البريد الإلكتروني غير صحيح"),
-  phone: z.string().min(1, "رقم الهاتف مطلوب"),
   address: z.string().min(1, "عنوان المتجر مطلوب"),
-  city: z.string().min(1, "المدينة مطلوبة"),
   openTime: z.string().min(1, "وقت الفتح مطلوب"),
   closeTime: z.string().min(1, "وقت الإغلاق مطلوب"),
   workingDays: z.array(z.string()).min(1, "يجب اختيار يوم عمل واحد على الأقل"),
@@ -64,10 +61,7 @@ export default function StoreSettings() {
       name: "",
       description: "",
       category: "",
-      email: "",
-      phone: "",
       address: "",
-      city: "",
       openTime: "09:00",
       closeTime: "22:00",
       workingDays: [],
@@ -95,10 +89,7 @@ export default function StoreSettings() {
         name: store.name || "",
         description: store.description || "",
         category: store.settings?.category || "",
-        email: store.settings?.email || "",
-        phone: store.settings?.phone || "",
         address: store.settings?.address || "",
-        city: store.settings?.city || "",
         openTime: store.settings?.openTime || "09:00",
         closeTime: store.settings?.closeTime || "22:00",
         workingDays: store.settings?.workingDays || [],
@@ -108,9 +99,6 @@ export default function StoreSettings() {
       // Set select values programmatically
       if (store.settings?.category) {
         setValue("category", store.settings.category);
-      }
-      if (store.settings?.city) {
-        setValue("city", store.settings.city);
       }
     }
   }, [stores, reset]);
@@ -132,10 +120,7 @@ export default function StoreSettings() {
           description: data.description,
           settings: {
             category: data.category,
-            email: data.email,
-            phone: data.phone,
             address: data.address,
-            city: data.city,
             openTime: data.openTime,
             closeTime: data.closeTime,
             workingDays: data.workingDays,
@@ -392,64 +377,41 @@ export default function StoreSettings() {
                     )}
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <Label htmlFor="phone">رقم الهاتف</Label>
-                      <Input
-                        id="phone"
-                        placeholder="+966501234567"
-                        {...register("phone")}
-                      />
-                      {errors.phone && (
-                        <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <Label htmlFor="email">البريد الإلكتروني</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="store@baknair-sudani.com"
-                        {...register("email")}
-                      />
-                      {errors.email && (
-                        <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-                      )}
+                  {/* User Information - Read Only */}
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">معلومات الاتصال (من بيانات المستخدم)</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <Label className="text-sm text-gray-600">رقم الهاتف</Label>
+                        <div className="mt-1 p-2 bg-white border border-gray-200 rounded-md text-sm">
+                          {user?.phone || "غير محدد"}
+                        </div>
+                      </div>
+                      <div>
+                        <Label className="text-sm text-gray-600">البريد الإلكتروني</Label>
+                        <div className="mt-1 p-2 bg-white border border-gray-200 rounded-md text-sm">
+                          {user?.email || "غير محدد"}
+                        </div>
+                      </div>
+                      <div>
+                        <Label className="text-sm text-gray-600">الدولة/المدينة</Label>
+                        <div className="mt-1 p-2 bg-white border border-gray-200 rounded-md text-sm">
+                          {user?.city && user?.country ? `${user.city} - ${user.country}` : "غير محدد"}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <Label htmlFor="address">عنوان المتجر</Label>
-                      <Input
-                        id="address"
-                        placeholder="شارع المملكة، حي الخالدية"
-                        {...register("address")}
-                      />
-                      {errors.address && (
-                        <p className="text-red-500 text-sm mt-1">{errors.address.message}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <Label htmlFor="city">المدينة</Label>
-                      <Select onValueChange={(value) => setValue("city", value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="الرياض - المملكة العربية السعودية" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="riyadh">الرياض - المملكة العربية السعودية</SelectItem>
-                          <SelectItem value="jeddah">جدة - المملكة العربية السعودية</SelectItem>
-                          <SelectItem value="kuwait">الكويت - دولة الكويت</SelectItem>
-                          <SelectItem value="dubai">دبي - دولة الإمارات العربية المتحدة</SelectItem>
-                          <SelectItem value="doha">الدوحة - دولة قطر</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {errors.city && (
-                        <p className="text-red-500 text-sm mt-1">{errors.city.message}</p>
-                      )}
-                    </div>
+                  <div>
+                    <Label htmlFor="address">عنوان المتجر التفصيلي</Label>
+                    <Input
+                      id="address"
+                      placeholder="شارع المملكة، حي الخالدية، المبنى رقم 123"
+                      {...register("address")}
+                    />
+                    {errors.address && (
+                      <p className="text-red-500 text-sm mt-1">{errors.address.message}</p>
+                    )}
                   </div>
                 </CardContent>
               </Card>

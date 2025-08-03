@@ -59,6 +59,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const user = await storage.createUser(userData);
       
+      // Auto-create store for merchants
+      if (user.role === 'merchant') {
+        try {
+          await storage.createStore({
+            name: `متجر ${user.fullName}`,
+            description: `متجر ${user.fullName} - متخصص في المنتجات عالية الجودة`,
+            ownerId: user.id,
+            isActive: true,
+            settings: {
+              category: "food-fragrance",
+              address: "",
+              openTime: "09:00",
+              closeTime: "22:00",
+              workingDays: ["sunday", "monday", "tuesday", "wednesday", "thursday"],
+            },
+          });
+        } catch (error) {
+          console.log("Error creating default store:", error);
+        }
+      }
+      
       res.json({
         user: {
           id: user.id,
