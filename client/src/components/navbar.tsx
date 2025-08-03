@@ -23,32 +23,55 @@ export default function Navbar() {
               SD
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">البيت</h1>
+              <h1 className="text-xl font-bold text-gray-900">
+                القفة السودانية
+              </h1>
               <p className="text-xs text-gray-500">سوق وخدمات السودان</p>
             </div>
           </div>
 
           {/* Main Navigation */}
           <div className="hidden lg:flex items-center space-x-reverse space-x-6">
-            <Link href="/" className={`text-sm font-medium transition-colors px-3 py-2 rounded-full ${location === '/' ? 'text-white bg-blue-600' : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'}`}>
+            <Link
+              href="/"
+              className={`text-sm font-medium transition-colors px-3 py-2 rounded-full ${location === "/" ? "text-white bg-blue-600" : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"}`}
+            >
               🏠 الرئيسية
             </Link>
-            <Link href="/market" className={`text-sm font-medium transition-colors px-3 py-2 rounded-full ${location === '/market' ? 'text-white bg-blue-600' : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'}`}>
+            <Link
+              href="/market"
+              className={`text-sm font-medium transition-colors px-3 py-2 rounded-full ${location === "/market" ? "text-white bg-blue-600" : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"}`}
+            >
               🛒 السوق
             </Link>
-            <Link href="/stores" className={`text-sm font-medium transition-colors px-3 py-2 rounded-full ${location === '/stores' ? 'text-white bg-blue-600' : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'}`}>
+            <Link
+              href="/stores"
+              className={`text-sm font-medium transition-colors px-3 py-2 rounded-full ${location === "/stores" ? "text-white bg-blue-600" : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"}`}
+            >
               🏪 المتاجر
             </Link>
-            <Link href="/jobs" className={`text-sm font-medium transition-colors px-3 py-2 rounded-full ${location === '/jobs' ? 'text-white bg-blue-600' : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'}`}>
+            <Link
+              href="/jobs"
+              className={`text-sm font-medium transition-colors px-3 py-2 rounded-full ${location === "/jobs" ? "text-white bg-blue-600" : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"}`}
+            >
               💼 الوظائف
             </Link>
-            <Link href="/restaurants" className={`text-sm font-medium transition-colors px-3 py-2 rounded-full ${location === '/restaurants' ? 'text-white bg-blue-600' : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'}`}>
+            <Link
+              href="/restaurants"
+              className={`text-sm font-medium transition-colors px-3 py-2 rounded-full ${location === "/restaurants" ? "text-white bg-blue-600" : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"}`}
+            >
               🍽️ المطاعم
             </Link>
-            <Link href="/services" className={`text-sm font-medium transition-colors px-3 py-2 rounded-full ${location === '/services' ? 'text-white bg-blue-600' : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'}`}>
+            <Link
+              href="/services"
+              className={`text-sm font-medium transition-colors px-3 py-2 rounded-full ${location === "/services" ? "text-white bg-blue-600" : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"}`}
+            >
               🔧 الخدمات
             </Link>
-            <Link href="/ads" className={`text-sm font-medium transition-colors px-3 py-2 rounded-full ${location === '/ads' ? 'text-white bg-blue-600' : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'}`}>
+            <Link
+              href="/ads"
+              className={`text-sm font-medium transition-colors px-3 py-2 rounded-full ${location === "/ads" ? "text-white bg-blue-600" : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"}`}
+            >
               📢 إعلانات
             </Link>
           </div>
@@ -72,9 +95,11 @@ export default function Navbar() {
                 <div className="flex items-center space-x-reverse space-x-2">
                   <Bell className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-600" />
                   <User className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-600" />
-                  <span className="text-sm text-gray-600">{user?.fullName}</span>
+                  <span className="text-sm text-gray-600">
+                    {user?.fullName}
+                  </span>
                 </div>
-                {user?.role === 'merchant' || user?.role === 'admin' ? (
+                {user?.role === "merchant" || user?.role === "admin" ? (
                   <Link href="/dashboard">
                     <Button variant="outline" size="sm">
                       لوحة التحكم
