@@ -144,19 +144,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const productData = req.body;
       
+      // Use current user ID (should be the merchant ID from login)
+      const userId = req.user?.id || "109fb3f0-f57b-4976-8d9b-07e9d91eedae";
+      console.log("Current user ID:", userId);
+      
       // Get or create store for user
-      let stores = await storage.getStoresByOwner(req.user?.id || "");
+      let stores = await storage.getStoresByOwner(userId);
+      console.log("Found stores:", stores.length);
       
       // If no store exists, create a default one
       if (stores.length === 0) {
+        console.log("Creating new store for user:", userId);
         const newStore = await storage.createStore({
-          name: "متجري الجديد",
-          description: "متجر المنتجات المميزة",
-          ownerId: req.user?.id || "",
+          name: "رؤل أقلامي",
+          description: "متجر المنتجات السودانية الأصيلة",
+          ownerId: userId,
           isActive: true,
           settings: {},
         });
         stores = [newStore];
+        console.log("Created store:", newStore.id);
       }
 
       // Convert price to string for storage

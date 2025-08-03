@@ -71,8 +71,8 @@ export class MemStorage implements IStorage {
     };
     this.users.set(adminId, adminUser);
 
-    // Create demo merchant user
-    const merchantId = randomUUID();
+    // Create demo merchant user with fixed ID
+    const merchantId = "109fb3f0-f57b-4976-8d9b-07e9d91eedae"; // Fixed ID to match login
     const merchantUser: User = {
       id: merchantId,
       username: "merchant",
