@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Eye, Edit, Trash2, ShoppingCart, ArrowLeft } from "lucide-react";
+import { Plus, Eye, Edit, Trash2, ShoppingCart, ArrowLeft, Store } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useQuery } from "@tanstack/react-query";
 import DashboardStats from "@/components/dashboard-stats";
@@ -39,7 +39,7 @@ export default function Dashboard() {
   if (!user) return null;
 
   const getStatusBadge = (status: string) => {
-    const statusMap = {
+    const statusMap: Record<string, { label: string; variant: "secondary" | "default" | "outline" }> = {
       pending: { label: "في الانتظار", variant: "secondary" as const },
       confirmed: { label: "مؤكد", variant: "default" as const },
       shipped: { label: "تم الشحن", variant: "outline" as const },
@@ -50,7 +50,7 @@ export default function Dashboard() {
   };
 
   const getStatusColor = (status: string) => {
-    const colorMap = {
+    const colorMap: Record<string, string> = {
       pending: "text-warning-orange",
       confirmed: "text-success-green",
       shipped: "text-purple-accent",
@@ -92,10 +92,10 @@ export default function Dashboard() {
         {/* Statistics Cards */}
         {stats && !statsLoading && (
           <DashboardStats
-            totalViews={stats.totalViews}
-            totalSales={stats.totalSales}
-            totalOrders={stats.totalOrders}
-            totalProducts={stats.totalProducts}
+            totalViews={stats.totalViews || 0}
+            totalSales={stats.totalSales || "$0.00"}
+            totalOrders={stats.totalOrders || 0}
+            totalProducts={stats.totalProducts || 0}
           />
         )}
 
@@ -261,7 +261,7 @@ export default function Dashboard() {
                 <div className="text-center py-8">جاري التحميل...</div>
               ) : (
                 <div className="space-y-4">
-                  {orders?.map((order) => (
+                  {orders && Array.isArray(orders) && orders.map((order: any) => (
                     <Card key={order.id}>
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
