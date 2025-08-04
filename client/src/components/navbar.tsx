@@ -99,10 +99,16 @@ export default function Navbar() {
                     {user?.fullName}
                   </span>
                 </div>
-                {user?.role === "merchant" || user?.role === "admin" ? (
+                {user?.role === "admin" ? (
+                  <Link href="/admin">
+                    <Button variant="outline" size="sm">
+                      لوحة إدارة النظام
+                    </Button>
+                  </Link>
+                ) : user?.role === "merchant" ? (
                   <Link href="/dashboard">
                     <Button variant="outline" size="sm">
-                      لوحة التحكم
+                      لوحة تحكم المتجر
                     </Button>
                   </Link>
                 ) : null}
