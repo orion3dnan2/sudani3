@@ -411,6 +411,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/admin/users", async (req, res) => {
+    try {
+      const userData = req.body;
+      
+      // Check if username or email already exists
+      const existingUserByUsername = await storage.getUserByUsername(userData.username);
+      if (existingUserByUsername) {
+        return res.status(400).json({ message: "اسم المستخدم موجود بالفعل" });
+      }
+      
+      const existingUserByEmail = await storage.getUserByEmail(userData.email);
+      if (existingUserByEmail) {
+        return res.status(400).json({ message: "البريد الإلكتروني موجود بالفعل" });
+      }
+      
+      const newUser = await storage.createUser({
+        ...userData,
+        isActive: true
+      });
+      
+      res.status(201).json(newUser);
+    } catch (error) {
+      console.error("Error creating user:", error);
+      res.status(500).json({ message: "خطأ في إنشاء المستخدم" });
+    }
+  });
+
   app.patch("/api/admin/users/:userId", async (req, res) => {
     try {
       const { userId } = req.params;

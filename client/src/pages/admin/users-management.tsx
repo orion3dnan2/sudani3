@@ -4,7 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { 
   ArrowLeft,
   UserPlus, 
@@ -25,6 +28,9 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 interface UserData {
   id: string;
@@ -39,12 +45,40 @@ interface UserData {
   createdAt: string;
 }
 
+const createUserSchema = z.object({
+  username: z.string().min(3, "اسم المستخدم يجب أن يكون 3 أحرف على الأقل"),
+  email: z.string().email("البريد الإلكتروني غير صحيح"),
+  password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل"),
+  fullName: z.string().min(2, "الاسم الكامل مطلوب"),
+  phone: z.string().optional(),
+  city: z.string().optional(),
+  country: z.string().optional(),
+  role: z.enum(["customer", "merchant", "admin"])
+});
+
+type CreateUserForm = z.infer<typeof createUserSchema>;
+
 export default function UsersManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRole, setFilterRole] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+
+  const form = useForm<CreateUserForm>({
+    resolver: zodResolver(createUserSchema),
+    defaultValues: {
+      username: "",
+      email: "",
+      password: "",
+      fullName: "",
+      phone: "",
+      city: "",
+      country: "السعودية",
+      role: "customer"
+    }
+  });
 
   const { data: users = [], isLoading } = useQuery({
     queryKey: ["/api/admin/users"],
@@ -83,6 +117,26 @@ export default function UsersManagement() {
     }
   });
 
+  const createUserMutation = useMutation({
+    mutationFn: async (userData: CreateUserForm) => {
+      const response = await apiRequest("POST", "/api/admin/users", userData);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({ title: "تم إنشاء المستخدم بنجاح" });
+      setShowCreateDialog(false);
+      form.reset();
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "خطأ في إنشاء المستخدم", 
+        description: error.message || "حدث خطأ غير متوقع",
+        variant: "destructive" 
+      });
+    }
+  });
+
   const filteredUsers = users.filter((user: UserData) => {
     const matchesSearch = user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -112,6 +166,10 @@ export default function UsersManagement() {
     if (confirm("هل أنت متأكد من حذف هذا المستخدم؟")) {
       deleteUserMutation.mutate(userId);
     }
+  };
+
+  const onSubmit = (data: CreateUserForm) => {
+    createUserMutation.mutate(data);
   };
 
   const getRoleIcon = (role: string) => {
@@ -169,10 +227,176 @@ export default function UsersManagement() {
           <Badge variant="secondary" className="bg-orange-100 text-orange-800">
             النظام
           </Badge>
-          <Button className="bg-blue-600 hover:bg-blue-700 flex items-center">
-            <UserPlus className="w-4 h-4 ml-2" />
-            إضافة مستخدم جديد
-          </Button>
+          <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+            <DialogTrigger asChild>
+              <Button className="bg-blue-600 hover:bg-blue-700 flex items-center">
+                <UserPlus className="w-4 h-4 ml-2" />
+                إضافة مستخدم جديد
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>إضافة مستخدم جديد</DialogTitle>
+              </DialogHeader>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="fullName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>الاسم الكامل</FormLabel>
+                        <FormControl>
+                          <Input placeholder="أدخل الاسم الكامل" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>اسم المستخدم</FormLabel>
+                        <FormControl>
+                          <Input placeholder="أدخل اسم المستخدم" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>البريد الإلكتروني</FormLabel>
+                        <FormControl>
+                          <Input type="email" placeholder="أدخل البريد الإلكتروني" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>كلمة المرور</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="أدخل كلمة المرور" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>رقم الهاتف (اختياري)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="أدخل رقم الهاتف" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <FormField
+                      control={form.control}
+                      name="city"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>المدينة (اختياري)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="المدينة" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="country"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>البلد</FormLabel>
+                          <FormControl>
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="السعودية">السعودية</SelectItem>
+                                <SelectItem value="الإمارات">الإمارات</SelectItem>
+                                <SelectItem value="الكويت">الكويت</SelectItem>
+                                <SelectItem value="قطر">قطر</SelectItem>
+                                <SelectItem value="البحرين">البحرين</SelectItem>
+                                <SelectItem value="عمان">عمان</SelectItem>
+                                <SelectItem value="السودان">السودان</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="role"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>دور المستخدم</FormLabel>
+                        <FormControl>
+                          <Select value={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="customer">عميل</SelectItem>
+                              <SelectItem value="merchant">تاجر</SelectItem>
+                              <SelectItem value="admin">مدير</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="flex gap-2 pt-4">
+                    <Button 
+                      type="submit" 
+                      className="flex-1"
+                      disabled={createUserMutation.isPending}
+                    >
+                      {createUserMutation.isPending ? "جاري الإنشاء..." : "إنشاء المستخدم"}
+                    </Button>
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      className="flex-1"
+                      onClick={() => setShowCreateDialog(false)}
+                    >
+                      إلغاء
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
