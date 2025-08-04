@@ -321,7 +321,7 @@ export default function StoresManagement() {
                       variant="outline"
                       size="sm"
                       className="flex items-center"
-                      onClick={() => setLocation(`/stores/${store.id}`)}
+                      onClick={() => setLocation(`/admin/stores/${store.id}`)}
                     >
                       <Eye className="w-4 h-4 ml-1" />
                       عرض التفاصيل

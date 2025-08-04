@@ -128,6 +128,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Orders by store route
+  app.get("/api/orders/store/:storeId", async (req, res) => {
+    try {
+      const { storeId } = req.params;
+      const orders = await storage.getOrdersByStore(storeId);
+      res.json(orders);
+    } catch (error) {
+      res.status(500).json({ message: "خطأ في الخادم" });
+    }
+  });
+
   // Store routes
   app.get("/api/stores/owner/:ownerId", async (req, res) => {
     try {

@@ -16,6 +16,7 @@ import AddProduct from "@/pages/add-product";
 import StoreSettings from "@/pages/store-settings";
 import AdminDashboard from "@/pages/admin-dashboard";
 import StoresManagement from "@/pages/admin/stores-management";
+import StoreDetails from "@/pages/admin/store-details";
 import UsersManagement from "@/pages/admin/users-management";
 import AppSettings from "@/pages/admin/app-settings";
 import ContentManagement from "@/pages/admin/content-management";
@@ -52,6 +53,7 @@ function Router() {
           <Route path="/store-settings" component={StoreSettings} />
           <Route path="/admin" component={AdminDashboard} />
           <Route path="/admin/stores" component={StoresManagement} />
+          <Route path="/admin/stores/:storeId" component={StoreDetails} />
           <Route path="/admin/users" component={UsersManagement} />
           <Route path="/admin/settings" component={AppSettings} />
           <Route path="/admin/content" component={ContentManagement} />
