@@ -8,6 +8,7 @@ import Home from "@/pages/home";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
 import Market from "@/pages/market";
+import Stores from "@/pages/stores";
 import Dashboard from "@/pages/dashboard";
 import Services from "@/pages/services";
 import ProductsManagement from "@/pages/products-management";
@@ -31,6 +32,7 @@ function Router() {
           <Route path="/login" component={Login} />
           <Route path="/register" component={Register} />
           <Route path="/market" component={Market} />
+          <Route path="/stores" component={Stores} />
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/services" component={Services} />
           <Route path="/products-management" component={ProductsManagement} />

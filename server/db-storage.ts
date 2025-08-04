@@ -39,6 +39,75 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(stores).where(eq(stores.ownerId, ownerId));
   }
 
+  async getAllStores(filters?: { category?: string; search?: string; city?: string }): Promise<(Store & { owner: { fullName: string; city: string } })[]> {
+    let query = db.select({
+      id: stores.id,
+      name: stores.name,
+      description: stores.description,
+      ownerId: stores.ownerId,
+      isActive: stores.isActive,
+      settings: stores.settings,
+      createdAt: stores.createdAt,
+      owner: {
+        fullName: users.fullName,
+        city: users.city,
+      }
+    })
+    .from(stores)
+    .innerJoin(users, eq(stores.ownerId, users.id))
+    .where(eq(stores.isActive, true));
+
+    const result = await query;
+    
+    // Apply filters
+    let filteredStores = result;
+    
+    if (filters?.category && filters.category !== 'all') {
+      filteredStores = filteredStores.filter(store => 
+        store.settings?.category === filters.category
+      );
+    }
+    
+    if (filters?.search) {
+      const searchLower = filters.search.toLowerCase();
+      filteredStores = filteredStores.filter(store => 
+        store.name.toLowerCase().includes(searchLower) ||
+        store.description.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    if (filters?.city && filters.city !== 'all') {
+      filteredStores = filteredStores.filter(store => 
+        store.owner.city === filters.city
+      );
+    }
+    
+    return filteredStores;
+  }
+
+  async getStoreById(id: string): Promise<(Store & { owner: { fullName: string; city: string; phone: string } }) | undefined> {
+    const result = await db.select({
+      id: stores.id,
+      name: stores.name,
+      description: stores.description,
+      ownerId: stores.ownerId,
+      isActive: stores.isActive,
+      settings: stores.settings,
+      createdAt: stores.createdAt,
+      owner: {
+        fullName: users.fullName,
+        city: users.city,
+        phone: users.phone,
+      }
+    })
+    .from(stores)
+    .innerJoin(users, eq(stores.ownerId, users.id))
+    .where(eq(stores.id, id))
+    .limit(1);
+    
+    return result[0];
+  }
+
   async createStore(insertStore: InsertStore): Promise<Store> {
     const result = await db.insert(stores).values(insertStore).returning();
     return result[0];

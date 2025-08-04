@@ -142,6 +142,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all active stores
+  app.get("/api/stores", async (req, res) => {
+    try {
+      const { category, search, city } = req.query;
+      const stores = await storage.getAllStores({
+        category: category as string,
+        search: search as string,
+        city: city as string,
+      });
+      res.json(stores);
+    } catch (error) {
+      res.status(500).json({ message: "خطأ في الخادم" });
+    }
+  });
+
+  // Get store by ID with details
+  app.get("/api/stores/:storeId", async (req, res) => {
+    try {
+      const { storeId } = req.params;
+      const store = await storage.getStoreById(storeId);
+      
+      if (!store) {
+        return res.status(404).json({ message: "المتجر غير موجود" });
+      }
+      
+      res.json(store);
+    } catch (error) {
+      res.status(500).json({ message: "خطأ في الخادم" });
+    }
+  });
+
   // Product routes
   app.get("/api/products/store/:storeId", async (req, res) => {
     try {
