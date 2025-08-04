@@ -401,6 +401,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin orders management routes
+  app.get("/api/admin/orders", async (req, res) => {
+    try {
+      const orders = await storage.getAllOrdersWithDetails();
+      res.json(orders);
+    } catch (error) {
+      res.status(500).json({ message: "خطأ في الخادم" });
+    }
+  });
+
+  app.patch("/api/admin/orders/:orderId", async (req, res) => {
+    try {
+      const { orderId } = req.params;
+      const updateData = req.body;
+      
+      const updatedOrder = await storage.updateOrder(orderId, updateData);
+      
+      if (!updatedOrder) {
+        return res.status(404).json({ message: "الطلب غير موجود" });
+      }
+      
+      res.json(updatedOrder);
+    } catch (error) {
+      console.error("Error updating order:", error);
+      res.status(500).json({ message: "خطأ في تحديث الطلب" });
+    }
+  });
+
   // Admin users management routes
   app.get("/api/admin/users", async (req, res) => {
     try {
