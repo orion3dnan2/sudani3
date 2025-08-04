@@ -1,11 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { DatabaseStorage } from "./db-storage";
-import { insertUserSchema } from "@shared/schema";
+import { storage } from "./storage";
+import { insertUserSchema, insertRestaurantSchema, insertJobSchema } from "@shared/schema";
 import { z } from "zod";
-
-// Initialize database storage
-const storage = new DatabaseStorage();
 
 const loginSchema = z.object({
   username: z.string(),
@@ -262,6 +259,134 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating store:", error);
       res.status(500).json({ message: "خطأ في تحديث المتجر" });
+    }
+  });
+
+  // Restaurant routes
+  app.get("/api/restaurants", async (req, res) => {
+    try {
+      const restaurants = await storage.getRestaurants();
+      res.json(restaurants);
+    } catch (error) {
+      res.status(500).json({ message: "خطأ في الخادم" });
+    }
+  });
+
+  app.get("/api/restaurants/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const restaurant = await storage.getRestaurant(id);
+      
+      if (!restaurant) {
+        return res.status(404).json({ message: "المطعم غير موجود" });
+      }
+      
+      res.json(restaurant);
+    } catch (error) {
+      res.status(500).json({ message: "خطأ في الخادم" });
+    }
+  });
+
+  app.get("/api/restaurants/owner/:ownerId", async (req, res) => {
+    try {
+      const { ownerId } = req.params;
+      const restaurants = await storage.getRestaurantsByOwner(ownerId);
+      res.json(restaurants);
+    } catch (error) {
+      res.status(500).json({ message: "خطأ في الخادم" });
+    }
+  });
+
+  app.post("/api/restaurants", async (req, res) => {
+    try {
+      const restaurantData = insertRestaurantSchema.parse(req.body);
+      const restaurant = await storage.createRestaurant(restaurantData);
+      res.status(201).json(restaurant);
+    } catch (error) {
+      console.error("Error creating restaurant:", error);
+      res.status(400).json({ message: "خطأ في البيانات المرسلة" });
+    }
+  });
+
+  app.patch("/api/restaurants/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updateData = req.body;
+      
+      const updatedRestaurant = await storage.updateRestaurant(id, updateData);
+      
+      if (!updatedRestaurant) {
+        return res.status(404).json({ message: "المطعم غير موجود" });
+      }
+      
+      res.json(updatedRestaurant);
+    } catch (error) {
+      console.error("Error updating restaurant:", error);
+      res.status(500).json({ message: "خطأ في تحديث المطعم" });
+    }
+  });
+
+  // Job routes
+  app.get("/api/jobs", async (req, res) => {
+    try {
+      const jobs = await storage.getJobs();
+      res.json(jobs);
+    } catch (error) {
+      res.status(500).json({ message: "خطأ في الخادم" });
+    }
+  });
+
+  app.get("/api/jobs/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const job = await storage.getJob(id);
+      
+      if (!job) {
+        return res.status(404).json({ message: "الوظيفة غير موجودة" });
+      }
+      
+      res.json(job);
+    } catch (error) {
+      res.status(500).json({ message: "خطأ في الخادم" });
+    }
+  });
+
+  app.get("/api/jobs/poster/:posterId", async (req, res) => {
+    try {
+      const { posterId } = req.params;
+      const jobs = await storage.getJobsByPoster(posterId);
+      res.json(jobs);
+    } catch (error) {
+      res.status(500).json({ message: "خطأ في الخادم" });
+    }
+  });
+
+  app.post("/api/jobs", async (req, res) => {
+    try {
+      const jobData = insertJobSchema.parse(req.body);
+      const job = await storage.createJob(jobData);
+      res.status(201).json(job);
+    } catch (error) {
+      console.error("Error creating job:", error);
+      res.status(400).json({ message: "خطأ في البيانات المرسلة" });
+    }
+  });
+
+  app.patch("/api/jobs/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updateData = req.body;
+      
+      const updatedJob = await storage.updateJob(id, updateData);
+      
+      if (!updatedJob) {
+        return res.status(404).json({ message: "الوظيفة غير موجودة" });
+      }
+      
+      res.json(updatedJob);
+    } catch (error) {
+      console.error("Error updating job:", error);
+      res.status(500).json({ message: "خطأ في تحديث الوظيفة" });
     }
   });
 

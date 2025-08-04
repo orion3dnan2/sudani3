@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Store, type InsertStore, type Product, type InsertProduct, type Order, type InsertOrder } from "@shared/schema";
+import { type User, type InsertUser, type Store, type InsertStore, type Product, type InsertProduct, type Order, type InsertOrder, type Restaurant, type InsertRestaurant, type Job, type InsertJob } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -28,6 +28,20 @@ export interface IStorage {
   createOrder(order: InsertOrder): Promise<Order>;
   updateOrder(id: string, updates: Partial<Order>): Promise<Order | undefined>;
   
+  // Restaurant operations
+  getRestaurant(id: string): Promise<Restaurant | undefined>;
+  getRestaurants(): Promise<Restaurant[]>;
+  getRestaurantsByOwner(ownerId: string): Promise<Restaurant[]>;
+  createRestaurant(restaurant: InsertRestaurant): Promise<Restaurant>;
+  updateRestaurant(id: string, updates: Partial<Restaurant>): Promise<Restaurant | undefined>;
+  
+  // Job operations
+  getJob(id: string): Promise<Job | undefined>;
+  getJobs(): Promise<Job[]>;
+  getJobsByPoster(posterId: string): Promise<Job[]>;
+  createJob(job: InsertJob): Promise<Job>;
+  updateJob(id: string, updates: Partial<Job>): Promise<Job | undefined>;
+  
   // Dashboard stats
   getDashboardStats(userId: string): Promise<{
     totalViews: number;
@@ -42,12 +56,16 @@ export class MemStorage implements IStorage {
   private stores: Map<string, Store>;
   private products: Map<string, Product>;
   private orders: Map<string, Order>;
+  private restaurants: Map<string, Restaurant>;
+  private jobs: Map<string, Job>;
 
   constructor() {
     this.users = new Map();
     this.stores = new Map();
     this.products = new Map();
     this.orders = new Map();
+    this.restaurants = new Map();
+    this.jobs = new Map();
     
     // Seed demo users
     this.seedDemoData();
@@ -175,6 +193,123 @@ export class MemStorage implements IStorage {
       };
       this.orders.set(orderId, order);
     }
+
+    // Create demo restaurants
+    const restaurants = [
+      {
+        name: "مطعم الشارقة السوداني",
+        description: "أشهى المأكولات السودانية التقليدية",
+        cuisine: "سوداني",
+        address: "شارع الملك فهد، الرياض",
+        phone: "+966501234567",
+        email: "sharqa@restaurants.com",
+        rating: "4.5",
+        openHours: "12:00 ص - 11:00 م",
+        deliveryPrice: "10.00",
+        minOrderAmount: "30.00",
+        image: "https://via.placeholder.com/400x300?text=مطعم+الشارقة",
+        ownerId: merchantId
+      },
+      {
+        name: "مطعم النيل الأزرق",
+        description: "مطعم متخصص في الأسماك والمشاوي السودانية",
+        cuisine: "مشاوي",
+        address: "حي العليا، الرياض",
+        phone: "+966501234568",
+        email: "bluenile@restaurants.com",
+        rating: "4.2",
+        openHours: "2:00 ص - 12:00 ص",
+        deliveryPrice: "15.00",
+        minOrderAmount: "50.00",
+        image: "https://via.placeholder.com/400x300?text=مطعم+النيل+الأزرق",
+        ownerId: adminId
+      },
+      {
+        name: "مطعم دار السلام",
+        description: "مطعم عائلي يقدم أفضل الأطباق السودانية",
+        cuisine: "عائلي",
+        address: "شارع التحلية، جدة",
+        phone: "+966501234569",
+        email: "darsalam@restaurants.com",
+        rating: "4.8",
+        openHours: "11:00 ص - 11:30 م", 
+        deliveryPrice: "12.00",
+        minOrderAmount: "40.00",
+        image: "https://via.placeholder.com/400x300?text=مطعم+دار+السلام",
+        ownerId: merchantId
+      }
+    ];
+
+    restaurants.forEach(restaurant => {
+      const restaurantId = randomUUID();
+      const newRestaurant: Restaurant = {
+        id: restaurantId,
+        ...restaurant,
+        isActive: true,
+        createdAt: new Date()
+      };
+      this.restaurants.set(restaurantId, newRestaurant);
+    });
+
+    // Create demo jobs
+    const jobs = [
+      {
+        title: "مطور تطبيقات جوال",
+        description: "مطلوب مطور تطبيقات جوال للعمل في شركة تقنية رائدة. الخبرة في React Native وFlutter مطلوبة.",
+        company: "شركة التقنيات المتقدمة",
+        location: "الرياض، السعودية",
+        jobType: "full-time",
+        category: "تقنية المعلومات",
+        salary: "8000 - 12000 ريال",
+        requirements: "خبرة 3 سنوات في تطوير التطبيقات، إتقان React Native أو Flutter، معرفة بـ JavaScript/TypeScript",
+        benefits: "راتب مجزي، تأمين صحي، إجازات مدفوعة",
+        contactEmail: "jobs@techcompany.com",
+        contactPhone: "+966501234567",
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        posterId: adminId
+      },
+      {
+        title: "مسؤول خدمة عملاء",
+        description: "مطلوب مسؤول خدمة عملاء للعمل في مركز اتصالات. يفضل الخبرة في خدمة العملاء.",
+        company: "مركز الاتصالات الرقمي",
+        location: "جدة، السعودية",
+        jobType: "full-time",
+        category: "خدمة عملاء",
+        salary: "4000 - 6000 ريال",
+        requirements: "خبرة سنة على الأقل، مهارات تواصل ممتازة، إتقان اللغة العربية والإنجليزية",
+        benefits: "راتب أساسي + عمولات، تأمين طبي",
+        contactEmail: "hr@callcenter.com",
+        contactPhone: "+966501234568",
+        expiresAt: new Date(Date.now() + 25 * 24 * 60 * 60 * 1000),
+        posterId: merchantId
+      },
+      {
+        title: "محاسب مالي",
+        description: "مطلوب محاسب مالي للعمل في شركة تجارية كبيرة. الخبرة في الأنظمة المحاسبية مطلوبة.",
+        company: "الشركة التجارية الكبرى",
+        location: "الدمام، السعودية",
+        jobType: "full-time",
+        category: "محاسبة ومالية",
+        salary: "6000 - 9000 ريال",
+        requirements: "شهادة محاسبة، خبرة 2-4 سنوات، معرفة بأنظمة ERP",
+        benefits: "راتب ثابت، بدلات، تأمين شامل",
+        contactEmail: "accounting@trading.com",
+        contactPhone: "+966501234569",
+        expiresAt: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000),
+        posterId: adminId
+      }
+    ];
+
+    jobs.forEach(job => {
+      const jobId = randomUUID();
+      const newJob: Job = {
+        id: jobId,
+        ...job,
+        isActive: true,
+        createdAt: new Date()
+      };
+      this.jobs.set(jobId, newJob);
+    });
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -345,6 +480,85 @@ export class MemStorage implements IStorage {
       totalOrders,
       totalProducts,
     };
+  }
+
+  // Restaurant operations
+  async getRestaurant(id: string): Promise<Restaurant | undefined> {
+    return this.restaurants.get(id);
+  }
+
+  async getRestaurants(): Promise<Restaurant[]> {
+    return Array.from(this.restaurants.values()).filter(restaurant => restaurant.isActive);
+  }
+
+  async getRestaurantsByOwner(ownerId: string): Promise<Restaurant[]> {
+    return Array.from(this.restaurants.values()).filter(restaurant => restaurant.ownerId === ownerId);
+  }
+
+  async createRestaurant(insertRestaurant: InsertRestaurant): Promise<Restaurant> {
+    const id = randomUUID();
+    const restaurant: Restaurant = {
+      ...insertRestaurant,
+      id,
+      description: insertRestaurant.description ?? null,
+      email: insertRestaurant.email ?? null,
+      rating: insertRestaurant.rating ?? "0.0",
+      image: insertRestaurant.image ?? null,
+      openHours: insertRestaurant.openHours ?? null,
+      deliveryPrice: insertRestaurant.deliveryPrice ?? "0.00",
+      minOrderAmount: insertRestaurant.minOrderAmount ?? "0.00",
+      isActive: insertRestaurant.isActive ?? true,
+      createdAt: new Date()
+    };
+    this.restaurants.set(id, restaurant);
+    return restaurant;
+  }
+
+  async updateRestaurant(id: string, updates: Partial<Restaurant>): Promise<Restaurant | undefined> {
+    const restaurant = this.restaurants.get(id);
+    if (!restaurant) return undefined;
+    
+    const updatedRestaurant = { ...restaurant, ...updates };
+    this.restaurants.set(id, updatedRestaurant);
+    return updatedRestaurant;
+  }
+
+  // Job operations
+  async getJob(id: string): Promise<Job | undefined> {
+    return this.jobs.get(id);
+  }
+
+  async getJobs(): Promise<Job[]> {
+    return Array.from(this.jobs.values()).filter(job => job.isActive);
+  }
+
+  async getJobsByPoster(posterId: string): Promise<Job[]> {
+    return Array.from(this.jobs.values()).filter(job => job.posterId === posterId);
+  }
+
+  async createJob(insertJob: InsertJob): Promise<Job> {
+    const id = randomUUID();
+    const job: Job = {
+      ...insertJob,
+      id,
+      salary: insertJob.salary ?? null,
+      benefits: insertJob.benefits ?? null,
+      contactPhone: insertJob.contactPhone ?? null,
+      isActive: insertJob.isActive ?? true,
+      expiresAt: insertJob.expiresAt ?? null,
+      createdAt: new Date()
+    };
+    this.jobs.set(id, job);
+    return job;
+  }
+
+  async updateJob(id: string, updates: Partial<Job>): Promise<Job | undefined> {
+    const job = this.jobs.get(id);
+    if (!job) return undefined;
+    
+    const updatedJob = { ...job, ...updates };
+    this.jobs.set(id, updatedJob);
+    return updatedJob;
   }
 }
 

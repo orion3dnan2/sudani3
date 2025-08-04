@@ -56,6 +56,43 @@ export const orders = pgTable("orders", {
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
 
+export const restaurants = pgTable("restaurants", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description"),
+  cuisine: text("cuisine").notNull(), // نوع المطبخ (سوداني، عربي، إيطالي، إلخ)
+  address: text("address").notNull(),
+  phone: text("phone").notNull(),
+  email: text("email"),
+  rating: decimal("rating", { precision: 2, scale: 1 }).default("0.0"),
+  image: text("image"),
+  openHours: text("open_hours"), // ساعات العمل
+  deliveryPrice: decimal("delivery_price", { precision: 8, scale: 2 }).default("0.00"),
+  minOrderAmount: decimal("min_order_amount", { precision: 8, scale: 2 }).default("0.00"),
+  isActive: boolean("is_active").notNull().default(true),
+  ownerId: varchar("owner_id").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+});
+
+export const jobs = pgTable("jobs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  company: text("company").notNull(),
+  location: text("location").notNull(),
+  jobType: text("job_type").notNull(), // full-time, part-time, contract, freelance
+  category: text("category").notNull(), // IT, Healthcare, Engineering, etc.
+  salary: text("salary"), // نطاق الراتب
+  requirements: text("requirements").notNull(),
+  benefits: text("benefits"),
+  contactEmail: text("contact_email").notNull(),
+  contactPhone: text("contact_phone"),
+  isActive: boolean("is_active").notNull().default(true),
+  expiresAt: timestamp("expires_at"),
+  posterId: varchar("poster_id").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+});
+
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
@@ -77,6 +114,16 @@ export const insertOrderSchema = createInsertSchema(orders).omit({
   orderNumber: true,
 });
 
+export const insertRestaurantSchema = createInsertSchema(restaurants).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertJobSchema = createInsertSchema(jobs).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertStore = z.infer<typeof insertStoreSchema>;
@@ -85,3 +132,7 @@ export type InsertProduct = z.infer<typeof insertProductSchema>;
 export type Product = typeof products.$inferSelect;
 export type InsertOrder = z.infer<typeof insertOrderSchema>;
 export type Order = typeof orders.$inferSelect;
+export type InsertRestaurant = z.infer<typeof insertRestaurantSchema>;
+export type Restaurant = typeof restaurants.$inferSelect;
+export type InsertJob = z.infer<typeof insertJobSchema>;
+export type Job = typeof jobs.$inferSelect;
