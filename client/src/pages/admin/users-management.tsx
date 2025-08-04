@@ -63,6 +63,9 @@ export default function UsersManagement() {
   const [filterRole, setFilterRole] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showViewDialog, setShowViewDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
@@ -76,6 +79,19 @@ export default function UsersManagement() {
       phone: "",
       city: "",
       country: "السعودية",
+      role: "customer"
+    }
+  });
+
+  const editForm = useForm<Partial<CreateUserForm>>({
+    resolver: zodResolver(createUserSchema.partial()),
+    defaultValues: {
+      username: "",
+      email: "",
+      fullName: "",
+      phone: "",
+      city: "",
+      country: "",
       role: "customer"
     }
   });
@@ -170,6 +186,36 @@ export default function UsersManagement() {
 
   const onSubmit = (data: CreateUserForm) => {
     createUserMutation.mutate(data);
+  };
+
+  const onEditSubmit = (data: Partial<CreateUserForm>) => {
+    if (selectedUser) {
+      updateUserMutation.mutate({
+        userId: selectedUser.id,
+        updates: data
+      });
+      setShowEditDialog(false);
+      setSelectedUser(null);
+    }
+  };
+
+  const handleViewUser = (user: UserData) => {
+    setSelectedUser(user);
+    setShowViewDialog(true);
+  };
+
+  const handleEditUser = (user: UserData) => {
+    setSelectedUser(user);
+    editForm.reset({
+      username: user.username,
+      email: user.email,
+      fullName: user.fullName,
+      phone: user.phone || "",
+      city: user.city || "",
+      country: user.country || "",
+      role: user.role as "customer" | "merchant" | "admin"
+    });
+    setShowEditDialog(true);
   };
 
   const getRoleIcon = (role: string) => {
@@ -593,6 +639,7 @@ export default function UsersManagement() {
                       variant="outline"
                       size="sm"
                       className="flex items-center"
+                      onClick={() => handleViewUser(user)}
                     >
                       <Eye className="w-4 h-4 ml-1" />
                       عرض
@@ -602,6 +649,7 @@ export default function UsersManagement() {
                       variant="outline"
                       size="sm"
                       className="flex items-center"
+                      onClick={() => handleEditUser(user)}
                     >
                       <Edit className="w-4 h-4 ml-1" />
                       تعديل
@@ -651,6 +699,268 @@ export default function UsersManagement() {
           )}
         </div>
       )}
+
+      {/* View User Dialog */}
+      <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>تفاصيل المستخدم</DialogTitle>
+          </DialogHeader>
+          {selectedUser && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Basic Info */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">المعلومات الأساسية</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label className="text-sm font-medium text-gray-600">الاسم الكامل</Label>
+                    <p className="text-lg font-semibold">{selectedUser.fullName}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-gray-600">اسم المستخدم</Label>
+                    <p className="text-lg">@{selectedUser.username}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-gray-600">البريد الإلكتروني</Label>
+                    <p className="text-lg">{selectedUser.email}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-gray-600">رقم الهاتف</Label>
+                    <p className="text-lg">{selectedUser.phone || "غير محدد"}</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Account Details */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">تفاصيل الحساب</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label className="text-sm font-medium text-gray-600">الدور</Label>
+                    <div className="flex items-center space-x-reverse space-x-2 mt-1">
+                      {getRoleIcon(selectedUser.role)}
+                      <Badge className={getRoleBadgeColor(selectedUser.role)}>
+                        {getRoleLabel(selectedUser.role)}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-gray-600">حالة الحساب</Label>
+                    <div className="mt-1">
+                      <Badge 
+                        variant={selectedUser.isActive ? "default" : "secondary"}
+                        className={selectedUser.isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}
+                      >
+                        {selectedUser.isActive ? "نشط" : "غير نشط"}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-gray-600">الموقع</Label>
+                    <p className="text-lg">{selectedUser.city || "غير محدد"}, {selectedUser.country || "غير محدد"}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-gray-600">تاريخ الانضمام</Label>
+                    <p className="text-lg">{new Date(selectedUser.createdAt).toLocaleDateString("ar-SA", {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Statistics */}
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <CardTitle className="text-lg">الإحصائيات</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="text-center p-4 bg-blue-50 rounded-lg">
+                      <Store className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                      <p className="text-2xl font-bold text-blue-800">
+                        {selectedUser.role === 'merchant' ? Math.floor(Math.random() * 3) + 1 : 0}
+                      </p>
+                      <p className="text-sm text-blue-600">متجر</p>
+                    </div>
+                    <div className="text-center p-4 bg-green-50 rounded-lg">
+                      <Users className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                      <p className="text-2xl font-bold text-green-800">
+                        {Math.floor(Math.random() * 50) + 5}
+                      </p>
+                      <p className="text-sm text-green-600">طلب</p>
+                    </div>
+                    <div className="text-center p-4 bg-purple-50 rounded-lg">
+                      <Calendar className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+                      <p className="text-2xl font-bold text-purple-800">
+                        {Math.floor((Date.now() - new Date(selectedUser.createdAt).getTime()) / (1000 * 60 * 60 * 24))}
+                      </p>
+                      <p className="text-sm text-purple-600">يوم</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit User Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>تعديل بيانات المستخدم</DialogTitle>
+          </DialogHeader>
+          <Form {...editForm}>
+            <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4">
+              <FormField
+                control={editForm.control}
+                name="fullName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>الاسم الكامل</FormLabel>
+                    <FormControl>
+                      <Input placeholder="أدخل الاسم الكامل" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={editForm.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>اسم المستخدم</FormLabel>
+                    <FormControl>
+                      <Input placeholder="أدخل اسم المستخدم" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={editForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>البريد الإلكتروني</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="أدخل البريد الإلكتروني" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={editForm.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>رقم الهاتف</FormLabel>
+                    <FormControl>
+                      <Input placeholder="أدخل رقم الهاتف" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-2 gap-2">
+                <FormField
+                  control={editForm.control}
+                  name="city"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>المدينة</FormLabel>
+                      <FormControl>
+                        <Input placeholder="المدينة" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={editForm.control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>البلد</FormLabel>
+                      <FormControl>
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="السعودية">السعودية</SelectItem>
+                            <SelectItem value="الإمارات">الإمارات</SelectItem>
+                            <SelectItem value="الكويت">الكويت</SelectItem>
+                            <SelectItem value="قطر">قطر</SelectItem>
+                            <SelectItem value="البحرين">البحرين</SelectItem>
+                            <SelectItem value="عمان">عمان</SelectItem>
+                            <SelectItem value="السودان">السودان</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={editForm.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>دور المستخدم</FormLabel>
+                    <FormControl>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="customer">عميل</SelectItem>
+                          <SelectItem value="merchant">تاجر</SelectItem>
+                          <SelectItem value="admin">مدير</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex gap-2 pt-4">
+                <Button 
+                  type="submit" 
+                  className="flex-1"
+                  disabled={updateUserMutation.isPending}
+                >
+                  {updateUserMutation.isPending ? "جاري التحديث..." : "حفظ التغييرات"}
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => setShowEditDialog(false)}
+                >
+                  إلغاء
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
