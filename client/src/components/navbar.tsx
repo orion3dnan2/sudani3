@@ -22,10 +22,10 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex items-center space-x-reverse space-x-3 flex-shrink-0">
             <div className="bg-gradient-to-r from-blue-600 to-green-600 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-sm sm:text-lg">ب</span>
+              <span className="text-white font-bold text-sm sm:text-lg">ق</span>
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-lg sm:text-xl font-bold text-gray-900">البيت السوداني</h1>
+              <h1 className="text-lg sm:text-xl font-bold text-gray-900">القفة السودانية</h1>
               <p className="text-xs text-gray-500">سوق وخدمات السودان</p>
             </div>
           </div>
