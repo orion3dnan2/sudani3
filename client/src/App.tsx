@@ -17,6 +17,7 @@ import StoreSettings from "@/pages/store-settings";
 import AdminDashboard from "@/pages/admin-dashboard";
 import Restaurants from "@/pages/restaurants";
 import Jobs from "@/pages/jobs";
+import Ads from "@/pages/ads";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { useLocation } from "wouter";
@@ -37,6 +38,7 @@ function Router() {
           <Route path="/stores" component={Stores} />
           <Route path="/restaurants" component={Restaurants} />
           <Route path="/jobs" component={Jobs} />
+          <Route path="/ads" component={Ads} />
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/services" component={Services} />
           <Route path="/products-management" component={ProductsManagement} />

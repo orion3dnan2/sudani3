@@ -93,6 +93,25 @@ export const jobs = pgTable("jobs", {
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
 
+export const ads = pgTable("ads", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  category: text("category").notNull(), // عقارات، سيارات، إلكترونيات، خدمات، إلخ
+  type: text("type").notNull(), // sale, rent, wanted, service
+  price: decimal("price", { precision: 10, scale: 2 }),
+  location: text("location"),
+  contactName: text("contact_name").notNull(),
+  contactPhone: text("contact_phone").notNull(),
+  contactEmail: text("contact_email"),
+  images: text("images").array(), // صور الإعلان
+  isActive: boolean("is_active").notNull().default(true),
+  isPremium: boolean("is_premium").notNull().default(false),
+  expiresAt: timestamp("expires_at"),
+  posterId: varchar("poster_id").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+});
+
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
@@ -124,6 +143,11 @@ export const insertJobSchema = createInsertSchema(jobs).omit({
   createdAt: true,
 });
 
+export const insertAdSchema = createInsertSchema(ads).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertStore = z.infer<typeof insertStoreSchema>;
@@ -136,3 +160,5 @@ export type InsertRestaurant = z.infer<typeof insertRestaurantSchema>;
 export type Restaurant = typeof restaurants.$inferSelect;
 export type InsertJob = z.infer<typeof insertJobSchema>;
 export type Job = typeof jobs.$inferSelect;
+export type InsertAd = z.infer<typeof insertAdSchema>;
+export type Ad = typeof ads.$inferSelect;

@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertRestaurantSchema, insertJobSchema } from "@shared/schema";
+import { insertUserSchema, insertRestaurantSchema, insertJobSchema, insertAdSchema } from "@shared/schema";
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -387,6 +387,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating job:", error);
       res.status(500).json({ message: "خطأ في تحديث الوظيفة" });
+    }
+  });
+
+  // Ad routes
+  app.get("/api/ads", async (req, res) => {
+    try {
+      const ads = await storage.getAds();
+      res.json(ads);
+    } catch (error) {
+      res.status(500).json({ message: "خطأ في الخادم" });
+    }
+  });
+
+  app.get("/api/ads/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const ad = await storage.getAd(id);
+      
+      if (!ad) {
+        return res.status(404).json({ message: "الإعلان غير موجود" });
+      }
+      
+      res.json(ad);
+    } catch (error) {
+      res.status(500).json({ message: "خطأ في الخادم" });
+    }
+  });
+
+  app.get("/api/ads/poster/:posterId", async (req, res) => {
+    try {
+      const { posterId } = req.params;
+      const ads = await storage.getAdsByPoster(posterId);
+      res.json(ads);
+    } catch (error) {
+      res.status(500).json({ message: "خطأ في الخادم" });
+    }
+  });
+
+  app.post("/api/ads", async (req, res) => {
+    try {
+      const adData = insertAdSchema.parse(req.body);
+      const ad = await storage.createAd(adData);
+      res.status(201).json(ad);
+    } catch (error) {
+      console.error("Error creating ad:", error);
+      res.status(400).json({ message: "خطأ في البيانات المرسلة" });
+    }
+  });
+
+  app.patch("/api/ads/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updateData = req.body;
+      
+      const updatedAd = await storage.updateAd(id, updateData);
+      
+      if (!updatedAd) {
+        return res.status(404).json({ message: "الإعلان غير موجود" });
+      }
+      
+      res.json(updatedAd);
+    } catch (error) {
+      console.error("Error updating ad:", error);
+      res.status(500).json({ message: "خطأ في تحديث الإعلان" });
     }
   });
 

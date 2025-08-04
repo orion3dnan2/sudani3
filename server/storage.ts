@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Store, type InsertStore, type Product, type InsertProduct, type Order, type InsertOrder, type Restaurant, type InsertRestaurant, type Job, type InsertJob } from "@shared/schema";
+import { type User, type InsertUser, type Store, type InsertStore, type Product, type InsertProduct, type Order, type InsertOrder, type Restaurant, type InsertRestaurant, type Job, type InsertJob, type Ad, type InsertAd } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -42,6 +42,13 @@ export interface IStorage {
   createJob(job: InsertJob): Promise<Job>;
   updateJob(id: string, updates: Partial<Job>): Promise<Job | undefined>;
   
+  // Ad operations
+  getAd(id: string): Promise<Ad | undefined>;
+  getAds(): Promise<Ad[]>;
+  getAdsByPoster(posterId: string): Promise<Ad[]>;
+  createAd(ad: InsertAd): Promise<Ad>;
+  updateAd(id: string, updates: Partial<Ad>): Promise<Ad | undefined>;
+  
   // Dashboard stats
   getDashboardStats(userId: string): Promise<{
     totalViews: number;
@@ -58,6 +65,7 @@ export class MemStorage implements IStorage {
   private orders: Map<string, Order>;
   private restaurants: Map<string, Restaurant>;
   private jobs: Map<string, Job>;
+  private ads: Map<string, Ad>;
 
   constructor() {
     this.users = new Map();
@@ -66,6 +74,7 @@ export class MemStorage implements IStorage {
     this.orders = new Map();
     this.restaurants = new Map();
     this.jobs = new Map();
+    this.ads = new Map();
     
     // Seed demo users
     this.seedDemoData();
@@ -309,6 +318,96 @@ export class MemStorage implements IStorage {
         createdAt: new Date()
       };
       this.jobs.set(jobId, newJob);
+    });
+
+    // Create demo ads
+    const ads = [
+      {
+        title: "شقة للإيجار في الرياض",
+        description: "شقة مفروشة 3 غرف نوم، 2 حمام، صالة، مطبخ في حي الملقا. قريبة من الخدمات والمواصلات.",
+        category: "عقارات",
+        type: "rent",
+        price: "2500.00",
+        location: "الرياض - حي الملقا",
+        contactName: "أحمد السعد",
+        contactPhone: "+966501234570",
+        contactEmail: "ahmed.saad@email.com",
+        images: ["https://via.placeholder.com/400x300?text=شقة+للإيجار"],
+        isPremium: true,
+        expiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
+        posterId: merchantId
+      },
+      {
+        title: "سيارة كامري 2020 للبيع",
+        description: "تويوتا كامري 2020، لون أبيض، ماشية 50,000 كم، حالة ممتازة، فحص شامل، سعر قابل للتفاوض.",
+        category: "سيارات",
+        type: "sale",
+        price: "65000.00",
+        location: "جدة - حي السلامة",
+        contactName: "محمد عبدالله",
+        contactPhone: "+966501234571",
+        contactEmail: "mohammed.a@email.com",
+        images: ["https://via.placeholder.com/400x300?text=كامري+2020"],
+        isPremium: false,
+        expiresAt: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000),
+        posterId: adminId
+      },
+      {
+        title: "خدمات صيانة أجهزة كهربائية",
+        description: "نقدم خدمات صيانة وإصلاح الأجهزة الكهربائية المنزلية. خبرة 10 سنوات، ضمان على الخدمة، أسعار مناسبة.",
+        category: "خدمات",
+        type: "service",
+        price: null,
+        location: "الدمام",
+        contactName: "فني الأجهزة",
+        contactPhone: "+966501234572",
+        contactEmail: "repair.service@email.com",
+        images: ["https://via.placeholder.com/400x300?text=صيانة+أجهزة"],
+        isPremium: false,
+        expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+        posterId: merchantId
+      },
+      {
+        title: "لابتوب ديل للبيع",
+        description: "لابتوب ديل انسبايرون 15، معالج i7، ذاكرة 16GB، قرص SSD 512GB، كارت شاشة منفصل، حالة ممتازة.",
+        category: "إلكترونيات",
+        type: "sale",
+        price: "3200.00",
+        location: "المدينة المنورة",
+        contactName: "سارة محمد",
+        contactPhone: "+966501234573",
+        contactEmail: "sara.m@email.com",
+        images: ["https://via.placeholder.com/400x300?text=لابتوب+ديل"],
+        isPremium: true,
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        posterId: adminId
+      },
+      {
+        title: "أبحث عن مدرس خصوصي",
+        description: "أبحث عن مدرس خصوصي لمادة الرياضيات للمرحلة الثانوية، يفضل أن يكون متخصص وذو خبرة.",
+        category: "خدمات",
+        type: "wanted",
+        price: null,
+        location: "مكة المكرمة",
+        contactName: "أم عبدالرحمن",
+        contactPhone: "+966501234574",
+        contactEmail: null,
+        images: [],
+        isPremium: false,
+        expiresAt: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
+        posterId: merchantId
+      }
+    ];
+
+    ads.forEach(ad => {
+      const adId = randomUUID();
+      const newAd: Ad = {
+        id: adId,
+        ...ad,
+        isActive: true,
+        createdAt: new Date()
+      };
+      this.ads.set(adId, newAd);
     });
   }
 
@@ -559,6 +658,46 @@ export class MemStorage implements IStorage {
     const updatedJob = { ...job, ...updates };
     this.jobs.set(id, updatedJob);
     return updatedJob;
+  }
+
+  // Ad operations
+  async getAd(id: string): Promise<Ad | undefined> {
+    return this.ads.get(id);
+  }
+
+  async getAds(): Promise<Ad[]> {
+    return Array.from(this.ads.values()).filter(ad => ad.isActive);
+  }
+
+  async getAdsByPoster(posterId: string): Promise<Ad[]> {
+    return Array.from(this.ads.values()).filter(ad => ad.posterId === posterId);
+  }
+
+  async createAd(insertAd: InsertAd): Promise<Ad> {
+    const id = randomUUID();
+    const ad: Ad = {
+      ...insertAd,
+      id,
+      price: insertAd.price ?? null,
+      location: insertAd.location ?? null,
+      contactEmail: insertAd.contactEmail ?? null,
+      images: insertAd.images ?? [],
+      isActive: insertAd.isActive ?? true,
+      isPremium: insertAd.isPremium ?? false,
+      expiresAt: insertAd.expiresAt ?? null,
+      createdAt: new Date()
+    };
+    this.ads.set(id, ad);
+    return ad;
+  }
+
+  async updateAd(id: string, updates: Partial<Ad>): Promise<Ad | undefined> {
+    const ad = this.ads.get(id);
+    if (!ad) return undefined;
+    
+    const updatedAd = { ...ad, ...updates };
+    this.ads.set(id, updatedAd);
+    return updatedAd;
   }
 }
 
