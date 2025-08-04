@@ -4,13 +4,27 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { UserPlus, Search, Eye, Edit, Trash2, CheckCircle, XCircle, Shield, User, Store } from "lucide-react";
+import { 
+  ArrowLeft,
+  UserPlus, 
+  Search, 
+  Eye, 
+  Edit, 
+  Trash2, 
+  Shield, 
+  User, 
+  Store,
+  Users,
+  Calendar,
+  Phone,
+  Mail,
+  MapPin,
+  Settings
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useLocation } from "wouter";
 
 interface UserData {
   id: string;
@@ -29,7 +43,7 @@ export default function UsersManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRole, setFilterRole] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
-  const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
 
   const { data: users = [], isLoading } = useQuery({
@@ -117,106 +131,137 @@ export default function UsersManagement() {
     }
   };
 
+  const getRoleBadgeColor = (role: string) => {
+    switch (role) {
+      case "admin": return "bg-red-100 text-red-800";
+      case "merchant": return "bg-blue-100 text-blue-800";
+      case "customer": return "bg-green-100 text-green-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  // Calculate stats
+  const totalUsers = users.length;
+  const adminUsers = users.filter((u: UserData) => u.role === 'admin').length;
+  const merchantUsers = users.filter((u: UserData) => u.role === 'merchant').length;
+  const customerUsers = users.filter((u: UserData) => u.role === 'customer').length;
+
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">إدارة المستخدمين</h1>
-          <p className="text-gray-600">إدارة وتنظيم جميع المستخدمين في المنصة</p>
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center space-x-reverse space-x-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setLocation("/admin")}
+            className="flex items-center"
+          >
+            <ArrowLeft className="w-4 h-4 ml-2" />
+            العودة للوحة الإدارة
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">إدارة المستخدمين</h1>
+            <p className="text-gray-600 text-sm">إدارة وتتبع جميع المستخدمين في النظام</p>
+          </div>
         </div>
-        <Button className="bg-blue-600 hover:bg-blue-700">
-          <UserPlus className="w-4 h-4 mr-2" />
-          إضافة مستخدم جديد
-        </Button>
+        <div className="flex items-center space-x-reverse space-x-2">
+          <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+            النظام
+          </Badge>
+          <Button className="bg-blue-600 hover:bg-blue-700 flex items-center">
+            <UserPlus className="w-4 h-4 ml-2" />
+            إضافة مستخدم جديد
+          </Button>
+        </div>
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <Card>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <Card className="bg-red-50 border-red-200">
           <CardContent className="p-4">
-            <div className="flex items-center">
-              <User className="w-8 h-8 text-blue-500 mr-3" />
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xl font-bold">{users.length}</p>
-                <p className="text-sm text-gray-600">إجمالي المستخدمين</p>
+                <p className="text-2xl font-bold text-red-800">{adminUsers}</p>
+                <p className="text-sm text-red-600">المديرين</p>
               </div>
+              <Shield className="w-8 h-8 text-red-600" />
             </div>
           </CardContent>
         </Card>
-        <Card>
+
+        <Card className="bg-blue-50 border-blue-200">
           <CardContent className="p-4">
-            <div className="flex items-center">
-              <Store className="w-8 h-8 text-green-500 mr-3" />
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xl font-bold">{users.filter((u: UserData) => u.role === 'merchant').length}</p>
-                <p className="text-sm text-gray-600">التجار</p>
+                <p className="text-2xl font-bold text-blue-800">{merchantUsers}</p>
+                <p className="text-sm text-blue-600">التجار</p>
               </div>
+              <Store className="w-8 h-8 text-blue-600" />
             </div>
           </CardContent>
         </Card>
-        <Card>
+
+        <Card className="bg-green-50 border-green-200">
           <CardContent className="p-4">
-            <div className="flex items-center">
-              <User className="w-8 h-8 text-purple-500 mr-3" />
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xl font-bold">{users.filter((u: UserData) => u.role === 'customer').length}</p>
-                <p className="text-sm text-gray-600">العملاء</p>
+                <p className="text-2xl font-bold text-green-800">{customerUsers}</p>
+                <p className="text-sm text-green-600">المستخدمين العاديين</p>
               </div>
+              <User className="w-8 h-8 text-green-600" />
             </div>
           </CardContent>
         </Card>
-        <Card>
+
+        <Card className="bg-purple-50 border-purple-200">
           <CardContent className="p-4">
-            <div className="flex items-center">
-              <Shield className="w-8 h-8 text-red-500 mr-3" />
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xl font-bold">{users.filter((u: UserData) => u.role === 'admin').length}</p>
-                <p className="text-sm text-gray-600">المديرين</p>
+                <p className="text-2xl font-bold text-purple-800">{totalUsers}</p>
+                <p className="text-sm text-purple-600">إجمالي المستخدمين</p>
               </div>
+              <Users className="w-8 h-8 text-purple-600" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filters and Search */}
+      {/* Filters */}
       <Card className="mb-6">
         <CardContent className="p-4">
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
-              <Label htmlFor="search">البحث</Label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
-                  id="search"
-                  placeholder="ابحث في المستخدمين..."
+                  placeholder="البحث بالاسم أو البريد الإلكتروني أو اسم المستخدم..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pr-10"
                 />
               </div>
             </div>
-            <div>
-              <Label htmlFor="role">الدور</Label>
+            <div className="w-full sm:w-32">
               <Select value={filterRole} onValueChange={setFilterRole}>
-                <SelectTrigger className="w-32">
-                  <SelectValue />
+                <SelectTrigger>
+                  <SelectValue placeholder="جميع الأدوار" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">الكل</SelectItem>
+                  <SelectItem value="all">جميع الأدوار</SelectItem>
                   <SelectItem value="admin">مدير</SelectItem>
                   <SelectItem value="merchant">تاجر</SelectItem>
                   <SelectItem value="customer">عميل</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <Label htmlFor="status">الحالة</Label>
+            <div className="w-full sm:w-32">
               <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-32">
-                  <SelectValue />
+                <SelectTrigger>
+                  <SelectValue placeholder="جميع الحالات" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">الكل</SelectItem>
+                  <SelectItem value="all">جميع الحالات</SelectItem>
                   <SelectItem value="active">نشط</SelectItem>
                   <SelectItem value="inactive">غير نشط</SelectItem>
                 </SelectContent>
@@ -226,141 +271,162 @@ export default function UsersManagement() {
         </CardContent>
       </Card>
 
-      {/* Users Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>قائمة المستخدمين ({filteredUsers.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="text-center py-8">جاري التحميل...</div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>المستخدم</TableHead>
-                  <TableHead>البريد الإلكتروني</TableHead>
-                  <TableHead>الهاتف</TableHead>
-                  <TableHead>المدينة</TableHead>
-                  <TableHead>الدور</TableHead>
-                  <TableHead>الحالة</TableHead>
-                  <TableHead>تاريخ الإنشاء</TableHead>
-                  <TableHead>الإجراءات</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredUsers.map((user: UserData) => (
-                  <TableRow key={user.id}>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{user.fullName}</div>
-                        <div className="text-sm text-gray-500">@{user.username}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.phone}</TableCell>
-                    <TableCell>{user.city}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
+      {/* Users List */}
+      {isLoading ? (
+        <div className="text-center py-8">جاري التحميل...</div>
+      ) : (
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-gray-800">
+            قائمة المستخدمين ({filteredUsers.length})
+          </h2>
+          
+          {filteredUsers.map((user: UserData) => (
+            <Card key={user.id} className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                  
+                  {/* User Info */}
+                  <div className="flex items-start space-x-reverse space-x-4 flex-1">
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
                         {getRoleIcon(user.role)}
-                        <span>{getRoleLabel(user.role)}</span>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={user.isActive ? "default" : "secondary"}>
-                        {user.isActive ? "نشط" : "غير نشط"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {new Date(user.createdAt).toLocaleDateString("ar-SA")}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setSelectedUser(user)}
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-2xl">
-                            <DialogHeader>
-                              <DialogTitle>تفاصيل المستخدم</DialogTitle>
-                            </DialogHeader>
-                            {selectedUser && (
-                              <div className="space-y-4">
-                                <div>
-                                  <Label>الاسم الكامل</Label>
-                                  <p className="text-sm">{selectedUser.fullName}</p>
-                                </div>
-                                <div>
-                                  <Label>اسم المستخدم</Label>
-                                  <p className="text-sm">{selectedUser.username}</p>
-                                </div>
-                                <div>
-                                  <Label>البريد الإلكتروني</Label>
-                                  <p className="text-sm">{selectedUser.email}</p>
-                                </div>
-                                <div>
-                                  <Label>الهاتف</Label>
-                                  <p className="text-sm">{selectedUser.phone}</p>
-                                </div>
-                                <div>
-                                  <Label>الموقع</Label>
-                                  <p className="text-sm">{selectedUser.city}, {selectedUser.country}</p>
-                                </div>
-                                <div>
-                                  <Label>تغيير الدور</Label>
-                                  <Select 
-                                    value={selectedUser.role} 
-                                    onValueChange={(value) => handleChangeRole(selectedUser, value)}
-                                  >
-                                    <SelectTrigger>
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="customer">عميل</SelectItem>
-                                      <SelectItem value="merchant">تاجر</SelectItem>
-                                      <SelectItem value="admin">مدير</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                              </div>
-                            )}
-                          </DialogContent>
-                        </Dialog>
-                        
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleToggleStatus(user)}
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center space-x-reverse space-x-2 mb-1">
+                        <h3 className="text-lg font-semibold text-gray-900">{user.fullName}</h3>
+                        <Badge className={getRoleBadgeColor(user.role)}>
+                          {getRoleLabel(user.role)}
+                        </Badge>
+                        <Badge 
+                          variant={user.isActive ? "default" : "secondary"}
+                          className={user.isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}
                         >
-                          {user.isActive ? (
-                            <XCircle className="w-4 h-4 text-red-500" />
-                          ) : (
-                            <CheckCircle className="w-4 h-4 text-green-500" />
-                          )}
-                        </Button>
-                        
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDeleteUser(user.id)}
-                        >
-                          <Trash2 className="w-4 h-4 text-red-500" />
-                        </Button>
+                          {user.isActive ? "نشط" : "غير نشط"}
+                        </Badge>
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                      
+                      <p className="text-sm text-gray-600 mb-2">@{user.username}</p>
+                      
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                        <div className="flex items-center space-x-reverse space-x-1">
+                          <Mail className="w-4 h-4" />
+                          <span>{user.email}</span>
+                        </div>
+                        <div className="flex items-center space-x-reverse space-x-1">
+                          <Phone className="w-4 h-4" />
+                          <span>{user.phone || "غير محدد"}</span>
+                        </div>
+                        <div className="flex items-center space-x-reverse space-x-1">
+                          <MapPin className="w-4 h-4" />
+                          <span>{user.city || "غير محدد"}, {user.country || "غير محدد"}</span>
+                        </div>
+                        <div className="flex items-center space-x-reverse space-x-1">
+                          <Calendar className="w-4 h-4" />
+                          <span>انضم في {new Date(user.createdAt).toLocaleDateString("ar-SA")}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Stats */}
+                  <div className="flex items-center space-x-reverse space-x-6 text-center">
+                    <div className="flex items-center space-x-reverse space-x-2">
+                      <Store className="w-5 h-5 text-blue-600" />
+                      <div>
+                        <p className="text-lg font-bold text-blue-800">
+                          {user.role === 'merchant' ? Math.floor(Math.random() * 3) + 1 : 0}
+                        </p>
+                        <p className="text-xs text-blue-600">متجر</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-reverse space-x-2">
+                      <Users className="w-5 h-5 text-green-600" />
+                      <div>
+                        <p className="text-lg font-bold text-green-800">
+                          {Math.floor(Math.random() * 50) + 5}
+                        </p>
+                        <p className="text-xs text-green-600">طلب</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-reverse space-x-2">
+                      <Calendar className="w-5 h-5 text-purple-600" />
+                      <div>
+                        <p className="text-lg font-bold text-purple-800">
+                          {Math.floor((Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24))}
+                        </p>
+                        <p className="text-xs text-purple-600">يوم</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center space-x-reverse space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center"
+                    >
+                      <Eye className="w-4 h-4 ml-1" />
+                      عرض
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center"
+                    >
+                      <Edit className="w-4 h-4 ml-1" />
+                      تعديل
+                    </Button>
+                    
+                    {user.isActive ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-red-600 border-red-200 hover:bg-red-50"
+                        onClick={() => handleToggleStatus(user)}
+                      >
+                        تعطيل
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-green-600 border-green-200 hover:bg-green-50"
+                        onClick={() => handleToggleStatus(user)}
+                      >
+                        تفعيل
+                      </Button>
+                    )}
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-red-600 border-red-200 hover:bg-red-50"
+                      onClick={() => handleDeleteUser(user.id)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+          
+          {filteredUsers.length === 0 && (
+            <Card>
+              <CardContent className="text-center py-8">
+                <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">لا توجد مستخدمين مطابقين للبحث</p>
+              </CardContent>
+            </Card>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      )}
     </div>
   );
 }

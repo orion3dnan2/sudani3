@@ -401,6 +401,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin users management routes
+  app.get("/api/admin/users", async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      res.json(users);
+    } catch (error) {
+      res.status(500).json({ message: "خطأ في الخادم" });
+    }
+  });
+
+  app.patch("/api/admin/users/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const updateData = req.body;
+      
+      const updatedUser = await storage.updateUser(userId, updateData);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "المستخدم غير موجود" });
+      }
+      
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ message: "خطأ في تحديث المستخدم" });
+    }
+  });
+
+  app.delete("/api/admin/users/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      
+      const deleted = await storage.deleteUser(userId);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "المستخدم غير موجود" });
+      }
+      
+      res.json({ message: "تم حذف المستخدم بنجاح" });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ message: "خطأ في حذف المستخدم" });
+    }
+  });
+
   // Admin stores management routes
   app.get("/api/admin/stores", async (req, res) => {
     try {
