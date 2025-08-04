@@ -788,8 +788,36 @@ export class MemStorage implements IStorage {
     this.ads.set(id, updatedAd);
     return updatedAd;
   }
+
+  async getAllOrdersWithDetails(): Promise<any[]> {
+    const orders = Array.from(this.orders.values());
+    const ordersWithDetails = orders.map(order => {
+      const customer = this.users.get(order.customerId);
+      const store = this.stores.get(order.storeId);
+      const merchant = store ? this.users.get(store.ownerId) : null;
+      
+      return {
+        id: order.id,
+        orderNumber: order.orderNumber,
+        customerId: order.customerId,
+        customerName: customer?.fullName || 'غير معروف',
+        customerEmail: customer?.email || '',
+        storeId: order.storeId,
+        storeName: store?.name || 'غير معروف',
+        merchantName: merchant?.fullName || 'غير معروف',
+        items: order.items,
+        totalAmount: parseFloat(order.totalAmount),
+        status: order.status,
+        shippingAddress: order.shippingAddress || {},
+        paymentMethod: 'نقدي عند التسليم',
+        createdAt: order.createdAt.toISOString(),
+        updatedAt: order.createdAt.toISOString()
+      };
+    });
+    
+    return ordersWithDetails;
+  }
 }
 
-// Use Database Storage since we have DATABASE_URL
-import { DatabaseStorage } from './db-storage';
-export const storage = new DatabaseStorage();
+// Use in-memory storage for Replit environment
+export const storage = new MemStorage();
