@@ -117,51 +117,6 @@ export default function AdminDashboard() {
     },
     {
       id: "analytics",
-      title: "التطوير والتحليلات", 
-      description: "مراجعة واعتماد المتاجر الجديدة",
-      icon: Store,
-      color: "text-red-600",
-      bgColor: "bg-red-50",
-      route: "/admin/stores"
-    },
-    {
-      id: "users",
-      title: "إدارة المستخدمين",
-      description: "حماية وتعديل وحذف المستخدمين والتطبيقات",
-      icon: Users,
-      color: "text-green-600", 
-      bgColor: "bg-green-50",
-      route: "/admin/users"
-    },
-    {
-      id: "settings",
-      title: "إعدادات التطبيق",
-      description: "إدارة الإعدادات العامة والتفضيلات الأساسية",
-      icon: Settings,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-      route: "/admin/settings"
-    },
-    {
-      id: "content",
-      title: "إدارة المحتوى",
-      description: "إدارة المحتوى والتصنيفات المختلفة",
-      icon: Wrench,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
-      route: "/admin/content"
-    },
-    {
-      id: "orders", 
-      title: "إعدادات الطلبات",
-      description: "إعدادات الدفع والشحن والضرائب الضريبية",
-      icon: ShoppingCart,
-      color: "text-red-600",
-      bgColor: "bg-red-50", 
-      route: "/admin/orders"
-    },
-    {
-      id: "analytics",
       title: "التطوير والتحليلات",
       description: "تحسين أداء وتحليل بيانات المنصة",
       icon: TrendingUp,
