@@ -12,6 +12,8 @@ export interface IStorage {
   // Store operations
   getStore(id: string): Promise<Store | undefined>;
   getStoresByOwner(ownerId: string): Promise<Store[]>;
+  getAllStores(filters?: { category?: string; search?: string; city?: string }): Promise<(Store & { owner: { fullName: string; city: string } })[]>;
+  getStoreById(id: string): Promise<(Store & { owner: { fullName: string; city: string; phone: string } }) | undefined>;
   createStore(store: InsertStore): Promise<Store>;
   updateStore(id: string, updates: Partial<Store>): Promise<Store | undefined>;
   
@@ -456,6 +458,59 @@ export class MemStorage implements IStorage {
     return Array.from(this.stores.values()).filter(store => store.ownerId === ownerId);
   }
 
+  async getAllStores(filters?: { category?: string; search?: string; city?: string }): Promise<(Store & { owner: { fullName: string; city: string } })[]> {
+    const stores = Array.from(this.stores.values()).filter(store => store.isActive);
+    const storesWithOwners = stores.map(store => {
+      const owner = this.users.get(store.ownerId);
+      return {
+        ...store,
+        owner: {
+          fullName: owner?.fullName || '',
+          city: owner?.city || ''
+        }
+      };
+    });
+
+    let filteredStores = storesWithOwners;
+    
+    if (filters?.category && filters.category !== 'all') {
+      filteredStores = filteredStores.filter(store => 
+        (store.settings as any)?.category === filters.category
+      );
+    }
+    
+    if (filters?.search) {
+      const searchLower = filters.search.toLowerCase();
+      filteredStores = filteredStores.filter(store => 
+        store.name.toLowerCase().includes(searchLower) ||
+        (store.description && store.description.toLowerCase().includes(searchLower))
+      );
+    }
+    
+    if (filters?.city && filters.city !== 'all') {
+      filteredStores = filteredStores.filter(store => 
+        store.owner.city === filters.city
+      );
+    }
+    
+    return filteredStores;
+  }
+
+  async getStoreById(id: string): Promise<(Store & { owner: { fullName: string; city: string; phone: string } }) | undefined> {
+    const store = this.stores.get(id);
+    if (!store) return undefined;
+    
+    const owner = this.users.get(store.ownerId);
+    return {
+      ...store,
+      owner: {
+        fullName: owner?.fullName || '',
+        city: owner?.city || '',
+        phone: owner?.phone || ''
+      }
+    };
+  }
+
   async createStore(insertStore: InsertStore): Promise<Store> {
     const id = randomUUID();
     const store: Store = { 
@@ -701,18 +756,6 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Use Database Storage if available, otherwise Memory Storage
-async function createStorage() {
-  try {
-    if (process.env.DATABASE_URL) {
-      const { DatabaseStorage } = await import('./db-storage');
-      return new DatabaseStorage();
-    }
-  } catch (error) {
-    console.log('Database not available, using memory storage:', error);
-  }
-  return new MemStorage();
-}
-
-export const storage = new MemStorage(); // Initialize immediately with memory storage
-createStorage().then(s => Object.assign(storage, s));
+// Use Database Storage since we have DATABASE_URL
+import { DatabaseStorage } from './db-storage';
+export const storage = new DatabaseStorage();

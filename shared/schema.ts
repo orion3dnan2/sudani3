@@ -148,17 +148,26 @@ export const insertAdSchema = createInsertSchema(ads).omit({
   createdAt: true,
 });
 
-export type InsertUser = z.infer<typeof insertUserSchema>;
+// Type definitions
 export type User = typeof users.$inferSelect;
-export type InsertStore = z.infer<typeof insertStoreSchema>;
+export type InsertUser = z.infer<typeof insertUserSchema>;
+
 export type Store = typeof stores.$inferSelect;
-export type InsertProduct = z.infer<typeof insertProductSchema>;
+export type InsertStore = z.infer<typeof insertStoreSchema>;
+
 export type Product = typeof products.$inferSelect;
-export type InsertOrder = z.infer<typeof insertOrderSchema>;
+export type InsertProduct = z.infer<typeof insertProductSchema>;
+
 export type Order = typeof orders.$inferSelect;
-export type InsertRestaurant = z.infer<typeof insertRestaurantSchema>;
+export type InsertOrder = z.infer<typeof insertOrderSchema>;
+
 export type Restaurant = typeof restaurants.$inferSelect;
-export type InsertJob = z.infer<typeof insertJobSchema>;
+export type InsertRestaurant = z.infer<typeof insertRestaurantSchema>;
+
 export type Job = typeof jobs.$inferSelect;
-export type InsertAd = z.infer<typeof insertAdSchema>;
+export type InsertJob = z.infer<typeof insertJobSchema>;
+
 export type Ad = typeof ads.$inferSelect;
+export type InsertAd = z.infer<typeof insertAdSchema>;
+
+

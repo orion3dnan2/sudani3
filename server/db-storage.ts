@@ -1,7 +1,7 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "./db";
-import { users, stores, products, orders } from "@shared/schema";
-import type { User, Store, Product, Order, InsertUser, InsertStore, InsertProduct, InsertOrder } from "@shared/schema";
+import { users, stores, products, orders, restaurants, jobs, ads } from "@shared/schema";
+import type { User, Store, Product, Order, Restaurant, Job, Ad, InsertUser, InsertStore, InsertProduct, InsertOrder, InsertRestaurant, InsertJob, InsertAd } from "@shared/schema";
 import { IStorage } from "./storage";
 
 export class DatabaseStorage implements IStorage {
@@ -50,7 +50,7 @@ export class DatabaseStorage implements IStorage {
       createdAt: stores.createdAt,
       owner: {
         fullName: users.fullName,
-        city: users.city,
+        city: users.city || '',
       }
     })
     .from(stores)
@@ -64,7 +64,7 @@ export class DatabaseStorage implements IStorage {
     
     if (filters?.category && filters.category !== 'all') {
       filteredStores = filteredStores.filter(store => 
-        store.settings?.category === filters.category
+        (store.settings as any)?.category === filters.category
       );
     }
     
@@ -72,7 +72,7 @@ export class DatabaseStorage implements IStorage {
       const searchLower = filters.search.toLowerCase();
       filteredStores = filteredStores.filter(store => 
         store.name.toLowerCase().includes(searchLower) ||
-        store.description.toLowerCase().includes(searchLower)
+        (store.description && store.description.toLowerCase().includes(searchLower))
       );
     }
     
@@ -96,8 +96,8 @@ export class DatabaseStorage implements IStorage {
       createdAt: stores.createdAt,
       owner: {
         fullName: users.fullName,
-        city: users.city,
-        phone: users.phone,
+        city: users.city || '',
+        phone: users.phone || '',
       }
     })
     .from(stores)
@@ -234,5 +234,77 @@ export class DatabaseStorage implements IStorage {
       totalOrders,
       totalProducts,
     };
+  }
+
+  // Restaurant operations
+  async getRestaurant(id: string): Promise<Restaurant | undefined> {
+    const result = await db.select().from(restaurants).where(eq(restaurants.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getRestaurants(): Promise<Restaurant[]> {
+    return await db.select().from(restaurants).where(eq(restaurants.isActive, true));
+  }
+
+  async getRestaurantsByOwner(ownerId: string): Promise<Restaurant[]> {
+    return await db.select().from(restaurants).where(eq(restaurants.ownerId, ownerId));
+  }
+
+  async createRestaurant(insertRestaurant: InsertRestaurant): Promise<Restaurant> {
+    const result = await db.insert(restaurants).values(insertRestaurant).returning();
+    return result[0];
+  }
+
+  async updateRestaurant(id: string, updates: Partial<Restaurant>): Promise<Restaurant | undefined> {
+    const result = await db.update(restaurants).set(updates).where(eq(restaurants.id, id)).returning();
+    return result[0];
+  }
+
+  // Job operations
+  async getJob(id: string): Promise<Job | undefined> {
+    const result = await db.select().from(jobs).where(eq(jobs.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getJobs(): Promise<Job[]> {
+    return await db.select().from(jobs).where(eq(jobs.isActive, true));
+  }
+
+  async getJobsByPoster(posterId: string): Promise<Job[]> {
+    return await db.select().from(jobs).where(eq(jobs.posterId, posterId));
+  }
+
+  async createJob(insertJob: InsertJob): Promise<Job> {
+    const result = await db.insert(jobs).values(insertJob).returning();
+    return result[0];
+  }
+
+  async updateJob(id: string, updates: Partial<Job>): Promise<Job | undefined> {
+    const result = await db.update(jobs).set(updates).where(eq(jobs.id, id)).returning();
+    return result[0];
+  }
+
+  // Ad operations
+  async getAd(id: string): Promise<Ad | undefined> {
+    const result = await db.select().from(ads).where(eq(ads.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getAds(): Promise<Ad[]> {
+    return await db.select().from(ads).where(eq(ads.isActive, true));
+  }
+
+  async getAdsByPoster(posterId: string): Promise<Ad[]> {
+    return await db.select().from(ads).where(eq(ads.posterId, posterId));
+  }
+
+  async createAd(insertAd: InsertAd): Promise<Ad> {
+    const result = await db.insert(ads).values(insertAd).returning();
+    return result[0];
+  }
+
+  async updateAd(id: string, updates: Partial<Ad>): Promise<Ad | undefined> {
+    const result = await db.update(ads).set(updates).where(eq(ads.id, id)).returning();
+    return result[0];
   }
 }
