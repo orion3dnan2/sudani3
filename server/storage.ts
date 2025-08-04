@@ -13,9 +13,11 @@ export interface IStorage {
   getStore(id: string): Promise<Store | undefined>;
   getStoresByOwner(ownerId: string): Promise<Store[]>;
   getAllStores(filters?: { category?: string; search?: string; city?: string }): Promise<(Store & { owner: { fullName: string; city: string } })[]>;
+  getAllStoresWithOwners(): Promise<(Store & { owner: { fullName: string; city: string; email: string; phone: string } })[]>;
   getStoreById(id: string): Promise<(Store & { owner: { fullName: string; city: string; phone: string } }) | undefined>;
   createStore(store: InsertStore): Promise<Store>;
   updateStore(id: string, updates: Partial<Store>): Promise<Store | undefined>;
+  deleteStore(id: string): Promise<boolean>;
   
   // Product operations
   getProduct(id: string): Promise<Product | undefined>;
@@ -525,6 +527,23 @@ export class MemStorage implements IStorage {
     return store;
   }
 
+  async getAllStoresWithOwners(): Promise<(Store & { owner: { fullName: string; city: string; email: string; phone: string } })[]> {
+    const stores = Array.from(this.stores.values());
+    const storesWithOwners = stores.map(store => {
+      const owner = this.users.get(store.ownerId);
+      return {
+        ...store,
+        owner: {
+          fullName: owner?.fullName || '',
+          city: owner?.city || '',
+          email: owner?.email || '',
+          phone: owner?.phone || ''
+        }
+      };
+    });
+    return storesWithOwners;
+  }
+
   async updateStore(id: string, updates: Partial<Store>): Promise<Store | undefined> {
     const store = this.stores.get(id);
     if (!store) return undefined;
@@ -532,6 +551,10 @@ export class MemStorage implements IStorage {
     const updatedStore = { ...store, ...updates };
     this.stores.set(id, updatedStore);
     return updatedStore;
+  }
+
+  async deleteStore(id: string): Promise<boolean> {
+    return this.stores.delete(id);
   }
 
   async getProduct(id: string): Promise<Product | undefined> {

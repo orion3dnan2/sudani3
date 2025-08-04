@@ -390,6 +390,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin stores management routes
+  app.get("/api/admin/stores", async (req, res) => {
+    try {
+      const stores = await storage.getAllStoresWithOwners();
+      res.json(stores);
+    } catch (error) {
+      res.status(500).json({ message: "خطأ في الخادم" });
+    }
+  });
+
+  app.patch("/api/admin/stores/:storeId", async (req, res) => {
+    try {
+      const { storeId } = req.params;
+      const updateData = req.body;
+      
+      const updatedStore = await storage.updateStore(storeId, updateData);
+      
+      if (!updatedStore) {
+        return res.status(404).json({ message: "المتجر غير موجود" });
+      }
+      
+      res.json(updatedStore);
+    } catch (error) {
+      console.error("Error updating store:", error);
+      res.status(500).json({ message: "خطأ في تحديث المتجر" });
+    }
+  });
+
+  app.delete("/api/admin/stores/:storeId", async (req, res) => {
+    try {
+      const { storeId } = req.params;
+      
+      const deleted = await storage.deleteStore(storeId);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "المتجر غير موجود" });
+      }
+      
+      res.json({ message: "تم حذف المتجر بنجاح" });
+    } catch (error) {
+      console.error("Error deleting store:", error);
+      res.status(500).json({ message: "خطأ في حذف المتجر" });
+    }
+  });
+
   // Ad routes
   app.get("/api/ads", async (req, res) => {
     try {

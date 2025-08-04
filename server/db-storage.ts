@@ -113,9 +113,36 @@ export class DatabaseStorage implements IStorage {
     return result[0];
   }
 
+  async getAllStoresWithOwners(): Promise<(Store & { owner: { fullName: string; city: string; email: string; phone: string } })[]> {
+    const result = await db.select({
+      id: stores.id,
+      name: stores.name,
+      description: stores.description,
+      ownerId: stores.ownerId,
+      isActive: stores.isActive,
+      settings: stores.settings,
+      createdAt: stores.createdAt,
+      owner: {
+        fullName: users.fullName,
+        city: users.city || '',
+        email: users.email,
+        phone: users.phone || '',
+      }
+    })
+    .from(stores)
+    .innerJoin(users, eq(stores.ownerId, users.id));
+
+    return result as any;
+  }
+
   async updateStore(id: string, updates: Partial<Store>): Promise<Store | undefined> {
     const result = await db.update(stores).set(updates).where(eq(stores.id, id)).returning();
     return result[0];
+  }
+
+  async deleteStore(id: string): Promise<boolean> {
+    const result = await db.delete(stores).where(eq(stores.id, id)).returning();
+    return result.length > 0;
   }
 
   async getProduct(id: string): Promise<Product | undefined> {
