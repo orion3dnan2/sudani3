@@ -15,6 +15,12 @@ import ProductsManagement from "@/pages/products-management";
 import AddProduct from "@/pages/add-product";
 import StoreSettings from "@/pages/store-settings";
 import AdminDashboard from "@/pages/admin-dashboard";
+import StoresManagement from "@/pages/admin/stores-management";
+import UsersManagement from "@/pages/admin/users-management";
+import AppSettings from "@/pages/admin/app-settings";
+import ContentManagement from "@/pages/admin/content-management";
+import OrdersManagement from "@/pages/admin/orders-management";
+import Analytics from "@/pages/admin/analytics";
 import Restaurants from "@/pages/restaurants";
 import Jobs from "@/pages/jobs";
 import Ads from "@/pages/ads";
@@ -45,6 +51,12 @@ function Router() {
           <Route path="/add-product" component={AddProduct} />
           <Route path="/store-settings" component={StoreSettings} />
           <Route path="/admin" component={AdminDashboard} />
+          <Route path="/admin/stores" component={StoresManagement} />
+          <Route path="/admin/users" component={UsersManagement} />
+          <Route path="/admin/settings" component={AppSettings} />
+          <Route path="/admin/content" component={ContentManagement} />
+          <Route path="/admin/orders" component={OrdersManagement} />
+          <Route path="/admin/analytics" component={Analytics} />
           <Route component={NotFound} />
         </Switch>
       </main>

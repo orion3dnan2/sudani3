@@ -31,7 +31,7 @@ export default function Navbar() {
           </div>
 
           {/* Main Navigation */}
-          <div className="hidden lg:flex items-center space-x-reverse space-x-6">
+          <div className="hidden md:flex items-center space-x-reverse space-x-4 lg:space-x-6">
             <Link
               href="/"
               className={`text-sm font-medium transition-colors px-3 py-2 rounded-full ${location === "/" ? "text-white bg-blue-600" : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"}`}
@@ -77,7 +77,7 @@ export default function Navbar() {
           </div>
 
           {/* Search Bar */}
-          <div className="hidden md:flex flex-1 max-w-lg mx-8">
+          <div className="hidden lg:flex flex-1 max-w-lg mx-4 lg:mx-8">
             <div className="relative w-full">
               <Input
                 type="text"
@@ -89,7 +89,7 @@ export default function Navbar() {
           </div>
 
           {/* User Actions */}
-          <div className="flex items-center space-x-reverse space-x-4">
+          <div className="flex items-center space-x-reverse space-x-2 sm:space-x-4">
             {isAuthenticated ? (
               <>
                 <div className="flex items-center space-x-reverse space-x-2">

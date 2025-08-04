@@ -72,7 +72,52 @@ export default function AdminDashboard() {
   const quickActions: QuickAction[] = [
     {
       id: "stores",
-      title: "إدارة المتاجر", 
+      title: "إدارة المتاجر",
+      description: "مراجعة وإدارة جميع المتاجر في المنصة",
+      icon: Store,
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
+      route: "/admin/stores"
+    },
+    {
+      id: "users",
+      title: "إدارة المستخدمين",
+      description: "إدارة المستخدمين والصلاحيات",
+      icon: Users,
+      color: "text-green-600", 
+      bgColor: "bg-green-50",
+      route: "/admin/users"
+    },
+    {
+      id: "orders",
+      title: "إعدادات الطلبات",
+      description: "متابعة وإدارة جميع الطلبات",
+      icon: ShoppingCart,
+      color: "text-purple-600",
+      bgColor: "bg-purple-50",
+      route: "/admin/orders"
+    },
+    {
+      id: "content",
+      title: "إدارة المحتوى",
+      description: "إدارة محتوى الموقع والصفحات",
+      icon: Package,
+      color: "text-orange-600",
+      bgColor: "bg-orange-50", 
+      route: "/admin/content"
+    },
+    {
+      id: "settings",
+      title: "إعدادات التطبيق",
+      description: "تخصيص إعدادات المنصة العامة",
+      icon: Settings,
+      color: "text-gray-600",
+      bgColor: "bg-gray-50",
+      route: "/admin/settings"
+    },
+    {
+      id: "analytics",
+      title: "التطوير والتحليلات", 
       description: "مراجعة واعتماد المتاجر الجديدة",
       icon: Store,
       color: "text-red-600",
@@ -119,7 +164,7 @@ export default function AdminDashboard() {
       id: "analytics",
       title: "التطوير والتحليلات",
       description: "تحسين أداء وتحليل بيانات المنصة",
-      icon: Heart,
+      icon: TrendingUp,
       color: "text-pink-600",
       bgColor: "bg-pink-50",
       route: "/admin/analytics"
@@ -217,53 +262,53 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
           <Card className="bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-2xl font-bold text-orange-800">{adminStats.totalRevenue} ر.س</p>
-                  <p className="text-sm text-orange-600">الإيرادات السنوية</p>
+            <CardContent className="p-3 sm:p-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
+                <div className="mb-2 sm:mb-0">
+                  <p className="text-lg sm:text-2xl font-bold text-orange-800">{adminStats.totalRevenue} ر.س</p>
+                  <p className="text-xs sm:text-sm text-orange-600">الإيرادات السنوية</p>
                 </div>
-                <TrendingUp className="w-8 h-8 text-orange-600" />
+                <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-orange-600" />
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-r from-purple-50 to-purple-100 border-purple-200">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-2xl font-bold text-purple-800">{adminStats.totalStores}</p>
-                  <p className="text-sm text-purple-600">إجمالي المتاجر</p>
+            <CardContent className="p-3 sm:p-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
+                <div className="mb-2 sm:mb-0">
+                  <p className="text-lg sm:text-2xl font-bold text-purple-800">{adminStats.totalStores}</p>
+                  <p className="text-xs sm:text-sm text-purple-600">إجمالي المتاجر</p>
                 </div>
-                <Store className="w-8 h-8 text-purple-600" />
+                <Store className="w-6 h-6 sm:w-8 sm:h-8 text-purple-600" />
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-r from-green-50 to-green-100 border-green-200">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-2xl font-bold text-green-800">{adminStats.activeStores}</p>
-                  <p className="text-sm text-green-600">المتاجر النشطة</p>
+            <CardContent className="p-3 sm:p-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
+                <div className="mb-2 sm:mb-0">
+                  <p className="text-lg sm:text-2xl font-bold text-green-800">{adminStats.activeStores}</p>
+                  <p className="text-xs sm:text-sm text-green-600">المتاجر النشطة</p>
                 </div>
-                <Package className="w-8 h-8 text-green-600" />
+                <Package className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-2xl font-bold text-blue-800">{adminStats.totalUsers}</p>
-                  <p className="text-sm text-blue-600">إجمالي المستخدمين</p>
+            <CardContent className="p-3 sm:p-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
+                <div className="mb-2 sm:mb-0">
+                  <p className="text-lg sm:text-2xl font-bold text-blue-800">{adminStats.totalUsers}</p>
+                  <p className="text-xs sm:text-sm text-blue-600">إجمالي المستخدمين</p>
                 </div>
-                <Users className="w-8 h-8 text-blue-600" />
+                <Users className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
               </div>
             </CardContent>
           </Card>
@@ -272,20 +317,27 @@ export default function AdminDashboard() {
         {/* Quick Actions */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">🔧 الإجراءات السريعة</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">🔧 الإجراءات السريعة</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {quickActions.map((action) => (
               <Card key={action.id} className="hover:shadow-lg transition-shadow cursor-pointer">
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <div className="flex items-start space-x-reverse space-x-4">
                     <div className={`p-3 rounded-lg ${action.bgColor}`}>
                       <action.icon className={`w-6 h-6 ${action.color}`} />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 mb-2">{action.title}</h3>
-                      <p className="text-sm text-gray-600 mb-3">{action.description}</p>
-                      <ArrowRight className="w-4 h-4 text-gray-400" />
+                      <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">{action.title}</h3>
+                      <p className="text-xs sm:text-sm text-gray-600 mb-3">{action.description}</p>
+                      <Button 
+                        onClick={() => action.route && setLocation(action.route)}
+                        size="sm" 
+                        className="w-full sm:w-auto"
+                      >
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                        الانتقال
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
@@ -295,7 +347,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Bottom Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
           {/* Quick Stats */}
           <Card>
             <CardHeader>

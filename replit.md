@@ -5,6 +5,7 @@ This is a full-stack Arabic marketplace application called "البيت السو�
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
+Design requirements: Responsive design for all platforms (mobile, tablet, desktop).
 
 # System Architecture
 
@@ -59,8 +60,9 @@ Preferred communication style: Simple, everyday language.
 
 ## UI Framework
 - **Radix UI**: Complete suite of unstyled, accessible UI primitives
-- **Tailwind CSS**: Utility-first CSS framework with custom design tokens
+- **Tailwind CSS**: Utility-first CSS framework with custom design tokens and responsive breakpoints
 - **Lucide React**: Icon library for consistent iconography
+- **Responsive Design**: Mobile-first approach with breakpoints for sm (640px), md (768px), lg (1024px), xl (1280px)
 
 ## Development Tools
 - **TypeScript**: Full TypeScript support across frontend and backend
