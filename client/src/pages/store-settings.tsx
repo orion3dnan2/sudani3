@@ -96,12 +96,15 @@ export default function StoreSettings() {
       });
       setSelectedDays(store.settings?.workingDays || []);
       
-      // Set select values programmatically
-      if (store.settings?.category) {
-        setValue("category", store.settings.category);
+      // Load existing images
+      if (store.settings?.logo) {
+        setLogoPreview(store.settings.logo);
+      }
+      if (store.settings?.cover) {
+        setCoverPreview(store.settings.cover);
       }
     }
-  }, [stores, reset]);
+  }, [stores, reset, setValue]);
 
   // Update store mutation
   const updateStoreMutation = useMutation({
@@ -124,6 +127,8 @@ export default function StoreSettings() {
             openTime: data.openTime,
             closeTime: data.closeTime,
             workingDays: data.workingDays,
+            logo: logoPreview,
+            cover: coverPreview,
           },
         }),
       });
@@ -342,7 +347,7 @@ export default function StoreSettings() {
 
                     <div>
                       <Label htmlFor="category">فئة المتجر</Label>
-                      <Select onValueChange={(value) => setValue("category", value)}>
+                      <Select onValueChange={(value) => setValue("category", value)} value={watch("category")}>
                         <SelectTrigger>
                           <SelectValue placeholder="حدائق غذائية وعطور" />
                         </SelectTrigger>
