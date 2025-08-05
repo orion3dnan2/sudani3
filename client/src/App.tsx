@@ -35,7 +35,6 @@ function Router() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {!hideNavAndFooter && <Navbar />}
       <main className="flex-1">
         <Switch>
           <Route path="/" component={Home} />
@@ -62,7 +61,6 @@ function Router() {
           <Route component={NotFound} />
         </Switch>
       </main>
-      {!hideNavAndFooter && <Footer />}
     </div>
   );
 }
