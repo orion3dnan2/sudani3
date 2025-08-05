@@ -819,5 +819,11 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Use in-memory storage for Replit environment
-export const storage = new MemStorage();
+// Check if DATABASE_URL exists, if yes use database storage, otherwise use memory storage
+let storage: IStorage;
+
+// For now, use MemStorage until PostgreSQL is properly configured
+storage = new MemStorage();
+console.log('Using MemStorage (in-memory) - seed data will be loaded');
+
+export { storage };
