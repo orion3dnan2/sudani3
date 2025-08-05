@@ -245,7 +245,10 @@ export default function StoreSettings() {
                   <Store className="w-5 h-5 text-purple-600" />
                   <span className="text-sm text-gray-700">الإشعارات</span>
                 </div>
-                <div className="flex items-center space-x-reverse space-x-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                <div 
+                  className="flex items-center space-x-reverse space-x-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer"
+                  onClick={() => setLocation("/storage-shipping")}
+                >
                   <Package className="w-5 h-5 text-gray-500" />
                   <span className="text-sm text-gray-700">التخزين والتوصيل</span>
                 </div>

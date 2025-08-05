@@ -14,6 +14,7 @@ import Services from "@/pages/services";
 import ProductsManagement from "@/pages/products-management";
 import AddProduct from "@/pages/add-product";
 import StoreSettings from "@/pages/store-settings";
+import StorageShipping from "@/pages/storage-shipping";
 import AdminDashboard from "@/pages/admin-dashboard";
 import StoresManagement from "@/pages/admin/stores-management";
 import StoreDetails from "@/pages/admin/store-details";
@@ -50,6 +51,7 @@ function Router() {
           <Route path="/products-management" component={ProductsManagement} />
           <Route path="/add-product" component={AddProduct} />
           <Route path="/store-settings" component={StoreSettings} />
+          <Route path="/storage-shipping" component={StorageShipping} />
           <Route path="/admin" component={AdminDashboard} />
           <Route path="/admin/stores" component={StoresManagement} />
           <Route path="/admin/stores/:storeId" component={StoreDetails} />
